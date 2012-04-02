@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Willkommen bei AKKtuell</string>
+    <string name="app_name">AKKtuell</string>
+    <string name="upcoming_events">anstehende Ereignisse:</string>
+
+</resources>
