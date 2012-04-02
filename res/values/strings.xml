@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="hello">Welcome to AKKtuell</string>
-    <string name="app_name">AKKtuell</string>
-    <string name="upcoming_events">upcoming events:</string>
-
-</resources>
