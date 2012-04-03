@@ -7,7 +7,8 @@
     <ImageView
         android:id="@+id/list_image_new"
         android:layout_width="wrap_content"
-        android:layout_height="55dp" />
+        android:layout_height="55dp"
+        android:src="@drawable/ic_new" />
 
     <TwoLineListItem
         android:id="@+id/listitem_listitem"
@@ -20,7 +21,8 @@
             android:id="@+id/listitem_eventname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Date" />
 
         <TextView
             android:id="@+id/listitem_eventdate"
@@ -28,7 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/listitem_eventname"
             android:layout_below="@id/listitem_eventname"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Title" />
     </TwoLineListItem>
 
     <CheckBox
