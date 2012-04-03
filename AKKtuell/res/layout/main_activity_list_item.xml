@@ -18,18 +18,18 @@
         android:mode="twoLine" > 
 
         <TextView
-            android:id="@+id/listitem_eventname"
+            android:id="@+id/listitem_eventdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Date" />
 
         <TextView
-            android:id="@+id/listitem_eventdate"
+            android:id="@+id/listitem_eventname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/listitem_eventname"
-            android:layout_below="@id/listitem_eventname"
+            android:layout_alignLeft="@id/listitem_eventdate"
+            android:layout_below="@id/listitem_eventdate"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Title" />
     </TwoLineListItem>
