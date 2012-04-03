@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/list_image_new"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp" />
+
+    <TwoLineListItem
+        android:id="@+id/listitem_listitem"
+        android:layout_width="201dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.72"
+        android:mode="twoLine" > 
+
+        <TextView
+            android:id="@+id/listitem_eventname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/listitem_eventdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/listitem_eventname"
+            android:layout_below="@id/listitem_eventname"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </TwoLineListItem>
+
+    <CheckBox
+        android:id="@+id/listitem_incalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
