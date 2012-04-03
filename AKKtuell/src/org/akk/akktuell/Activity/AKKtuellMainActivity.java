@@ -34,10 +34,10 @@ public class AKKtuellMainActivity extends Activity {
     	Cursor cursor = infoManager.getData();
     	
     	//TODO define fields from db to display
-    	String[] elementIDs = new String[] {"Date", "Title"};
+    	String[] elementIDs = new String[] {"New", "Date", "Title", "inCalendar"};
     	
     	//set View to use
-    	int[] itemView = new int[] { R.id.listitem_eventdate, R.id.listitem_eventname};
+    	int[] itemView = new int[] { R.id.list_image_new, R.id.listitem_eventdate, R.id.listitem_eventname, R.id.listitem_incalendar};
     	
     	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main_activity_list_item, cursor, elementIDs, itemView);
     	
