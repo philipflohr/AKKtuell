@@ -1,5 +1,7 @@
 package org.akk.akktuell.Model;
 
+import android.database.Cursor;
+
 
 public class InfoManager {
 
@@ -8,6 +10,12 @@ public class InfoManager {
 	
 	public InfoManager() {
 		calendar = new CalendarBridge();
+	}
+
+
+	public Cursor getData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
