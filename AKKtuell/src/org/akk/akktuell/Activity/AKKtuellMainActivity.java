@@ -19,11 +19,9 @@ public class AKKtuellMainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        infoManager = new InfoManager();
+        infoManager = new InfoManager(getApplicationContext());
 
-        elementListView = (ListView) findViewById(R.id.main_element_listview);
-        
-        //check online
+        elementListView = (ListView) findViewById(R.id.main_element_listview);        
         
         displayData();
         
