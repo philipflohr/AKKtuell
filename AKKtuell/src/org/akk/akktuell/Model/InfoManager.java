@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 
 public class InfoManager {
@@ -34,6 +35,14 @@ public class InfoManager {
 		
 		
 	}
+	
+	private void updateEvents() {
+		if (this.isOnline) {
+			
+		} else {
+			Log.d("Updater", "Unable to update: no internet connection");
+		}
+	}
 
 
 	public Cursor getData() {
@@ -47,5 +56,11 @@ public class InfoManager {
 		return false;
 	}
 	
+	public boolean isInCalendar(/*TODO: define arguments*/) {
+		return true;
+	}
 	
+	public void addToCalendar(/*TODO: define arguments*/) {
+		calendar.addEvent(/*TODO: define arguments*/);
+	}
 }
