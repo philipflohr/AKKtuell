@@ -26,19 +26,27 @@ public class AKKtuellMainActivity extends Activity {
         displayData();
         
         setContentView(R.layout.main);
+        
+        //set up eventListener
     }
     
     private void displayData() {
-    	Cursor cursor = infoManager.getData();
+    	if (infoManager.readyToDisplayData()) {
+    		Cursor cursor = infoManager.getData();
+    		//TODO define fields from db to display
+    		String[] elementIDs = new String[] {"New", "Date", "Title", "inCalendar"};
     	
-    	//TODO define fields from db to display
-    	String[] elementIDs = new String[] {"New", "Date", "Title", "inCalendar"};
+    		//set View to use
+    		int[] itemView = new int[] { R.id.list_image_new, R.id.listitem_eventdate, R.id.listitem_eventname, R.id.listitem_incalendar};
     	
-    	//set View to use
-    	int[] itemView = new int[] { R.id.list_image_new, R.id.listitem_eventdate, R.id.listitem_eventname, R.id.listitem_incalendar};
+    		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main_activity_list_item, cursor, elementIDs, itemView);
     	
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main_activity_list_item, cursor, elementIDs, itemView);
+    		elementListView.setAdapter(adapter);
+    	} else {
+    		//wait for data update
+    	}
     	
-    	elementListView.setAdapter(adapter);
     }
+    
+    
 }

@@ -40,6 +40,12 @@ public class InfoManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+	public boolean readyToDisplayData() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	
 }
