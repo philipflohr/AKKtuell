@@ -24,10 +24,13 @@ public class InfoManager {
 	
 	private Updater updater;
 	
+	private Thread t;
+	
 	public InfoManager(Context context) {
 		applicationContext = context;
 		calendar = new CalendarBridge();
 		updater = new Updater();
+		t = null;
 		
 		//check online state
 		this.isOnline = false;
@@ -47,7 +50,7 @@ public class InfoManager {
 	private void updateEvents() {
 		if (this.isOnline) {
 			if (updater.updateNeeded()) {
-				Thread t = new Thread(updater);
+				t = new Thread(updater);
 				t.run();
 			} else {
 				Log.d("InfoManager", "No updated required");
@@ -65,7 +68,8 @@ public class InfoManager {
 
 
 	public boolean readyToDisplayData() {
-		// TODO Auto-generated method stub
+		//check if Data is present
+		
 		return false;
 	}
 	

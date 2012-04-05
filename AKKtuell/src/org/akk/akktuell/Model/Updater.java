@@ -65,7 +65,7 @@ public class Updater implements Runnable{
 				String eventDescription = currentObject.getString(AKK_API_EVENT_DESCRIPTION);
 				String eventBeginTime = currentObject.getString(AKK_API_EVENT_BEGIN_TIME);
 				Uri eventPictureUri = new Uri(currentObject.getString(AKK_API_EVENT_PICTURE_URI));
-				AkkEvent event = new AkkEvent();
+				AkkEvent event = new AkkEvent(eventName, eventDate, eventDescription, eventBeginTime, eventPictureUri);
 				if (!this.events.contains(event)) {
 					this.events.add(event)
 				}
