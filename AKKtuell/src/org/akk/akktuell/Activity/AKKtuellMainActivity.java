@@ -7,6 +7,7 @@ import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -37,8 +38,13 @@ public class AKKtuellMainActivity extends Activity {
         	public void onItemClick(AdapterView<?> parent, View view,
         			int position, long id) {
         			AkkEvent clickedEvent = (AkkEvent) AKKtuellMainActivity.this.elementListView.getAdapter().getItem(position);
-        			Toast.makeText(getApplicationContext(),
-        				clickedEvent.getEventDescription(), Toast.LENGTH_LONG).show();
+        			if (clickedEvent != null) {
+        				Intent intent = new Intent(AKKtuellMainActivity.this,AKKtuellEventView.class);
+        				intent.putExtra("EVENT_NAME", clickedEvent.getEventName());
+        				intent.putExtra("EVENT_DATE", "test");
+        				intent.putExtra("EVENT_DESCRIPTION", clickedEvent.getEventDescription());
+        				startActivity(intent);
+        			}
         		}
         });
         displayData();

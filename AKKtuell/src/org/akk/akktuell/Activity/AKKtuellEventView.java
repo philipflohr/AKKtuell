@@ -34,7 +34,7 @@ public class AKKtuellEventView extends Activity {
 		eventName.setText(intent.getStringExtra("EVENT_NAME"));
 		eventDate.setText(intent.getStringExtra("EVENT_DATE"));
 		eventDescription.setText(intent.getStringExtra("EVENT_DESCRIPTION"));
-		Uri eventPicUri = (Uri) intent.getSerializableExtra("EVENT_PICTURE_URI");
-		eventImage.setImageURI(eventPicUri);
+		//Uri eventPicUri = (Uri) intent.getSerializableExtra("EVENT_PICTURE_URI");
+		//eventImage.setImageURI(eventPicUri);
 	}
 }
