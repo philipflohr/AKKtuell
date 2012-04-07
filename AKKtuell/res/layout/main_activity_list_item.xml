@@ -8,21 +8,24 @@
         android:id="@+id/list_image_new"
         android:layout_width="wrap_content"
         android:layout_height="55dp"
-        android:src="@drawable/ic_new" />
+        android:src="@drawable/ic_new"
+        android:focusable="false" />
 
     <TwoLineListItem
         android:id="@+id/listitem_listitem"
         android:layout_width="201dp"
         android:layout_height="wrap_content"
         android:layout_weight="0.72"
-        android:mode="twoLine" > 
+        android:mode="twoLine"
+        android:focusable="false" > 
 
         <TextView
             android:id="@+id/listitem_eventdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Date" />
+            android:text="Date"
+            android:focusable="false" />
 
         <TextView
             android:id="@+id/listitem_eventname"
@@ -31,12 +34,14 @@
             android:layout_alignLeft="@id/listitem_eventdate"
             android:layout_below="@id/listitem_eventdate"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Title" />
+            android:text="Title" 
+            android:focusable="false"/>
     </TwoLineListItem>
 
     <CheckBox
         android:id="@+id/listitem_incalendar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" 
+        android:focusable="false"/>
 
 </LinearLayout>

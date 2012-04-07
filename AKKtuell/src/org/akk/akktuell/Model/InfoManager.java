@@ -80,8 +80,10 @@ public class InfoManager {
 		// TODO Auto-generated method stub
 		
 		//Test
-		AkkEvent[] test = new AkkEvent[1];
-		test[0] = new AkkEvent("eventName", "eventdescription", new GregorianCalendar(), null);
+		AkkEvent[] test = new AkkEvent[20];
+		for (int i = 0; i < 20; i++) {
+			test[i] = new AkkEvent("eventName" + i, "eventdescription" + i, new GregorianCalendar(), null);
+		}
 		return test;
 	}
 }

@@ -17,7 +17,6 @@
     <ListView
         android:id="@+id/main_element_listview"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-    />
+        android:layout_height="fill_parent" />
 
 </LinearLayout>
