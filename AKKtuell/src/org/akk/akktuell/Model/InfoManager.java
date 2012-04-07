@@ -72,8 +72,8 @@ public class InfoManager {
 		return true;
 	}
 	
-	public void addToCalendar(/*TODO: define arguments*/) {
-		calendar.addEvent(/*TODO: define arguments*/);
+	public void addToCalendar(AkkEvent event) {
+		calendar.addEvent(event);
 	}
 
 	public AkkEvent[] getEvents() {
