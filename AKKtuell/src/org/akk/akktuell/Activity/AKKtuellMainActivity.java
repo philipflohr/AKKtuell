@@ -1,6 +1,9 @@
 package org.akk.akktuell.Activity;
 
+import java.util.GregorianCalendar;
+
 import org.akk.akktuell.R;
+import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
 
 import android.app.Activity;
@@ -22,30 +25,22 @@ public class AKKtuellMainActivity extends Activity {
         
         infoManager = new InfoManager(getApplicationContext());
 
+
+        setContentView(R.layout.main);
         elementListView = (ListView) findViewById(R.id.main_element_listview);        
         
         displayData();
         
-        setContentView(R.layout.main);
         
         //set up eventListener
     }
     
     private void displayData() {
-    	if (infoManager.readyToDisplayData()) {
-    		Cursor cursor = infoManager.getData();
-    		//TODO define fields from db to display
-    		String[] elementIDs = new String[] {"New", "Date", "Title", "inCalendar"};
-    	
-    		//set View to use
-    		int[] itemView = new int[] { R.id.list_image_new, R.id.listitem_eventdate, R.id.listitem_eventname, R.id.listitem_incalendar};
-    	
-    		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main_activity_list_item, cursor, elementIDs, itemView);
-    	
-    		elementListView.setAdapter(adapter);
-    	} else {
+    	if (!infoManager.readyToDisplayData()) {
     		//wait for data update
-    	}
+    	} 
+    	AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents());
+    	elementListView.setAdapter(adapter);
     	
     }
     

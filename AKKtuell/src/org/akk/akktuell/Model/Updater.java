@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Currency;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,16 +31,31 @@ public class Updater implements Runnable{
 	
 	private static String AKK_API_ADRESS="";
 	private static String AKK_API_EVENT_NAME="";
-	private static String AKK_API_EVENT_DATE="";
 	private static String AKK_API_EVENT_PICTURE_URI="";
 	private static String AKK_API_EVENT_DESCRIPTION="";
 	private static String AKK_API_EVENT_BEGIN_TIME="";
 	
 	private LinkedList<AkkEvent> events;
 	
+	private GregorianCalendar lastTimeUpdated;
 	
-	public Updater(LinkedList<AkkEvent> events) {
-		this.events = events;
+	
+	public Updater(LinkedList<AkkEvent> events, GregorianCalendar lastUpdated) {
+		if (events == null) {
+			//no events in database
+			this.events = new LinkedList<AkkEvent>();
+		} else {
+			this.events = events;
+		}
+		
+		if (lastUpdated == null) {
+			//not yet updated
+			lastTimeUpdated = new GregorianCalendar();
+			lastTimeUpdated.set(0, 1, 1);
+			//this should be before today;)
+		}else {
+			lastTimeUpdated = lastUpdated;
+		}
 	}
 	
 	private void updateEventList() {
@@ -61,13 +77,25 @@ public class Updater implements Runnable{
 			try {
 				JSONObject currentObject = akkEvents.getJSONObject(i);
 				String eventName = currentObject.getString(AKK_API_EVENT_NAME);
-				String eventDate = currentObject.getString(AKK_API_EVENT_DATE);
 				String eventDescription = currentObject.getString(AKK_API_EVENT_DESCRIPTION);
-				String eventBeginTime = currentObject.getString(AKK_API_EVENT_BEGIN_TIME);
-				Uri eventPictureUri = new Uri(currentObject.getString(AKK_API_EVENT_PICTURE_URI));
-				AkkEvent event = new AkkEvent(eventName, eventDate, eventDescription, eventBeginTime, eventPictureUri);
+				//GregorianCalendar eventBeginTime = currentObject.get(AKK_API_EVENT_BEGIN_TIME);
+				//Uri eventPictureUri = new Uri(currentObject.getString(AKK_API_EVENT_PICTURE_URI));
+				//AkkEvent event = new AkkEvent(eventName, eventDescription, eventBeginTime, eventPictureUri);
+				AkkEvent event = new AkkEvent(eventName, eventDescription, null, null);
+				
 				if (!this.events.contains(event)) {
-					this.events.add(event)
+					this.events.add(event);
+				} else {
+					//let's see if this event got updated
+					for (AkkEvent currentEvent: events) {
+						if (currentEvent.equals(event)) {
+							if (!currentEvent.wasUpdated(event)) {
+								events.remove(currentEvent);
+								events.add(event);
+								break;
+							}
+						}
+					}
 				}
 				
 			} catch (JSONException e) {

@@ -1,5 +1,6 @@
 package org.akk.akktuell.Model;
 
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.json.JSONException;
@@ -29,7 +30,7 @@ public class InfoManager {
 	public InfoManager(Context context) {
 		applicationContext = context;
 		calendar = new CalendarBridge();
-		updater = new Updater();
+		updater = new Updater(null, null);
 		t = null;
 		
 		//check online state
@@ -61,12 +62,6 @@ public class InfoManager {
 	}
 
 
-	public Cursor getData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 	public boolean readyToDisplayData() {
 		//check if Data is present
 		
@@ -79,5 +74,14 @@ public class InfoManager {
 	
 	public void addToCalendar(/*TODO: define arguments*/) {
 		calendar.addEvent(/*TODO: define arguments*/);
+	}
+
+	public AkkEvent[] getEvents() {
+		// TODO Auto-generated method stub
+		
+		//Test
+		AkkEvent[] test = new AkkEvent[1];
+		test[0] = new AkkEvent("eventName", "eventdescription", new GregorianCalendar(), null);
+		return test;
 	}
 }
