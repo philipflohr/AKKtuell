@@ -5,20 +5,20 @@ import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AKKtuellEventView extends Activity {
-	
-		private Tools tools;
-	 @Override
-	 public void onCreate(Bundle savedInstanceState) {
-	     super.onCreate(savedInstanceState);
-	     this.tools = Tools.getInstance(this);
-	     setupView();
-	 }
+
+	private Tools tools;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.tools = Tools.getInstance(this);
+		setupView();
+	}
 
 	private void setupView() {
 		if (tools.isInLandscapeMode()) {
@@ -34,7 +34,8 @@ public class AKKtuellEventView extends Activity {
 		eventName.setText(intent.getStringExtra("EVENT_NAME"));
 		eventDate.setText(intent.getStringExtra("EVENT_DATE"));
 		eventDescription.setText(intent.getStringExtra("EVENT_DESCRIPTION"));
-		//Uri eventPicUri = (Uri) intent.getSerializableExtra("EVENT_PICTURE_URI");
-		//eventImage.setImageURI(eventPicUri);
+		// Uri eventPicUri = (Uri)
+		// intent.getSerializableExtra("EVENT_PICTURE_URI");
+		// eventImage.setImageURI(eventPicUri);
 	}
 }

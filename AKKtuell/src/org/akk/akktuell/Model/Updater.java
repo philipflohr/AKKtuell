@@ -3,7 +3,6 @@ package org.akk.akktuell.Model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Currency;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
