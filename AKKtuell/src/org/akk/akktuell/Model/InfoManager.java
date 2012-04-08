@@ -68,8 +68,8 @@ public class InfoManager {
 		return false;
 	}
 	
-	public boolean isInCalendar(/*TODO: define arguments*/) {
-		return true;
+	public boolean isInCalendar(AkkEvent event) {
+		return true;//NICHT;)
 	}
 	
 	public void addToCalendar(AkkEvent event) {

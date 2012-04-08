@@ -1,22 +1,16 @@
 package org.akk.akktuell.Activity;
 
-import java.util.GregorianCalendar;
-
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 public class AKKtuellMainActivity extends Activity {
 	
@@ -55,7 +49,7 @@ public class AKKtuellMainActivity extends Activity {
     	if (!infoManager.readyToDisplayData()) {
     		//wait for data update
     	} 
-    	AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents());
+    	AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents(), infoManager);
     	elementListView.setAdapter(adapter);
     	
     }

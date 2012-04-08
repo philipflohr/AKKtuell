@@ -46,4 +46,5 @@ public class Tools {
 		Display display = activity.getWindowManager().getDefaultDisplay();
     	return display.getWidth() > display.getHeight() ? true : false;
 	}
+	
 }

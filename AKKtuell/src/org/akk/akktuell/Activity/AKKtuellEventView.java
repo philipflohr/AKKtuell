@@ -5,6 +5,7 @@ import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,5 +38,15 @@ public class AKKtuellEventView extends Activity {
 		// Uri eventPicUri = (Uri)
 		// intent.getSerializableExtra("EVENT_PICTURE_URI");
 		// eventImage.setImageURI(eventPicUri);
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		//To speed up the app, the activity is not restarted on screen rotation
+		if (Tools.getInstance(this).isInLandscapeMode()) {
+			setContentView(R.layout.simple_event_view_landscape);
+		} else {
+			setContentView(R.layout.simple_event_view);
+		}
 	}
 }

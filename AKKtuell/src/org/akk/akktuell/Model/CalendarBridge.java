@@ -1,20 +1,21 @@
 package org.akk.akktuell.Model;
 
 import android.os.Build;
+import android.util.Log;
 
 public class CalendarBridge {
 
-	private boolean usesCalendarContract;
-	
-	private CalendarBridge calendar;
+	private CalendarBridgeProvider calendar;
 	
 	public CalendarBridge () {
-		if (Build.VERSION.SDK_INT > 4) {
-			this.usesCalendarContract = true;
-			this.calendar =  new CalendarBridgeUsingCalendarContract();
-		} else {
-			this.usesCalendarContract = false;
-			this.calendar =  new CalendarBridgeNotUsingCalendarContract();
+		if (calendar == null) {
+			if (Build.VERSION.SDK_INT > 14) {
+				Log.d("Akktuell", "Benutze Android4: CalendarCotract");
+				this.calendar =  new CalendarBridgeUsingCalendarContract();
+			} else {
+				Log.d("Akktuell", "Benutze seltsamen Kalender workaround");
+				this.calendar =  new CalendarBridgeNotUsingCalendarContract();
+			}
 		}
 	}
 	
