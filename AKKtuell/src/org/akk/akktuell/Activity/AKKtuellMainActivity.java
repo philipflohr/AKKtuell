@@ -21,7 +21,7 @@ public class AKKtuellMainActivity extends Activity  {
 	private ListView elementListView;
 	private GestureDetector gestureScanner;
 	private int monthCounter;
-	private static int MAX_SIZE_OF_GESTURE=900;
+	private static int MAX_SIZE_OF_GESTURE=500;
 	
 	
     @Override
@@ -32,10 +32,10 @@ public class AKKtuellMainActivity extends Activity  {
 			@Override
 			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 					float velocityY) {
-				if (velocityX < -MAX_SIZE_OF_GESTURE) {
-					monthCounter++;
-				} else if (velocityX > MAX_SIZE_OF_GESTURE){
+				if (velocityX > MAX_SIZE_OF_GESTURE) {
 					monthCounter--;
+				} else if (velocityX < -1*MAX_SIZE_OF_GESTURE){
+					monthCounter++;
 				} else {
 					//this is not a guesture we want to interpret
 				}
