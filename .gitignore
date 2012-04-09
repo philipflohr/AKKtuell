@@ -1,6 +1,9 @@
-#/AKKtuell/.classpath
+/AKKtuell/.settings
+/AKKtuell/lint.xml
 /AKKtuell/bin
 /AKKtuell/gen
-#/AKKtuellTest/.classpath
+
+/AKKtuellTest/.settings
+/AKKtuellTest/lint.xml
 /AKKtuellTest/bin
-AKKtuellTest/gen
+/AKKtuellTest/gen
