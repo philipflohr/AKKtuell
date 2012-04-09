@@ -2,17 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello" />
+    android:orientation="vertical"
+    android:id="@+id/main_activity_layout" >
     
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/upcoming_events" />
+        android:id="@+id/main_activity_list_header"
+        android:textSize="25dp" />
     
     <ListView
         android:id="@+id/main_element_listview"
