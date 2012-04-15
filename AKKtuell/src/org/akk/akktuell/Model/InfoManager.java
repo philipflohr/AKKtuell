@@ -1,16 +1,12 @@
 package org.akk.akktuell.Model;
 
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.util.LinkedList;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+
+import org.akk.akktuell.database.*;
 
 
 public class InfoManager {
@@ -27,8 +23,17 @@ public class InfoManager {
 	
 	private Thread t;
 	
+	private AkkHomepageEventParser parser;
+	
+	private Database database;
+	
+	private LinkedList<AkkEvent> eventsSortedByDate;
+	
 	public InfoManager(Context context) {
 		applicationContext = context;
+		database = Database.getInstance(context);
+		eventsSortedByDate = new LinkedList<AkkEvent>();
+		//eventsSortedByDate = database.getAllEvents(orderBy, direction);
 		calendar = new CalendarBridge();
 		updater = new Updater(null, null);
 		t = null;
@@ -45,7 +50,8 @@ public class InfoManager {
 		}
 		//finished checking
 		
-		
+		parser = new AkkHomepageEventParser(context, this);
+		parser.updateEvents();
 	}
 	
 	private void updateEvents() {
@@ -63,9 +69,10 @@ public class InfoManager {
 
 
 	public boolean readyToDisplayData() {
-		//check if Data is present
-		
-		return false;
+		if (this.eventsSortedByDate.size() < 30) {
+			return false;
+		}
+		return true;
 	}
 	
 	public boolean isInCalendar(AkkEvent event) {
@@ -77,13 +84,14 @@ public class InfoManager {
 	}
 
 	public AkkEvent[] getEvents() {
-		// TODO Auto-generated method stub
-		
-		//Test
-		AkkEvent[] test = new AkkEvent[20];
-		for (int i = 0; i < 20; i++) {
-			test[i] = new AkkEvent("eventName" + i, "eventdescription" + i, new GregorianCalendar(), null);
+		AkkEvent result[] = new AkkEvent[eventsSortedByDate.size()];
+		for (int i = 0; i < eventsSortedByDate.size(); i++) {
+			result[i] = eventsSortedByDate.get(i);
 		}
-		return test;
+		return result;
+	}
+	
+	public void addEventToList(AkkEvent event){
+		eventsSortedByDate.addLast(event);
 	}
 }

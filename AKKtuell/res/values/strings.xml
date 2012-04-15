@@ -5,5 +5,6 @@
     <string name="app_name">AKKtuell</string>
     <string name="upcoming_events">upcoming events:</string>
     <string name="pic_description_dummy">This Text should be replaced by a picture concerning the Schlonz</string>
+    <string name="no_description_available">Sorry, there is no description</string>
 
 </resources>
