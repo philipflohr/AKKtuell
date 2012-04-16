@@ -177,6 +177,9 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEvent.setDescription(currentEventString);
 							newAkkEvent.setType(AkkEventType.Schlonz);
 							this.addElementToWaitingList(newAkkEvent);
+							synchronized (this) {
+								notify();
+							}
 						} else {
 							String source = currentEventString.split("</SPAN>")[2];
 							newAkkEventName = source.split("</TD><TD>")[1];
@@ -188,11 +191,8 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
 							newAkkEvent.setDescription(context.getResources().getString(R.string.hello));
 							newAkkEvent.setType(AkkEventType.Schlonz);
-							this.addElementToDBPushList(newAkkEvent);
 						}
-						synchronized (this) {
-							notify();
-						}
+						
 						
 					} catch (ArrayIndexOutOfBoundsException e) {
 						Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
