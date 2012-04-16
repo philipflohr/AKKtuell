@@ -25,15 +25,14 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private LinkedList<AkkEvent> eventsWaitingForDBPush;
 	private ThreadGroup getDescThreads;
 	private Context context;
-	private InfoManager infoManager;
 	private boolean updateRequested = false;
 	private ArrayList<EventDownloadListener> listeners = new ArrayList<EventDownloadListener>();
 	private Thread mainThread;
 	
-	public AkkHomepageEventParser(Context ctx, InfoManager infoManager) {
+	public AkkHomepageEventParser(Context ctx) {
 		mainThread = Thread.currentThread();
+
 		this.context = ctx;
-		this.infoManager = infoManager;
 		this.eventsWaitingForDescription = new LinkedList<AkkEvent>();
 		this.eventsWaitingForDBPush = new LinkedList<AkkEvent>();
 		getDescThreads = new ThreadGroup("EventUpdateThreads");
@@ -326,6 +325,26 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				}
 			}
 		}	
+	}
+
+	/**
+	 * Notifies the attached listeners when a download has started.
+	 */
+	private void notifyOnDownloadStarted() {
+		for (EventDownloadListener l : this.listeners) {
+			l.downloadStarted();
+		}
+	}
+
+	/**
+	 * Notifies the attached listeners when the download has finished
+	 * and returns the downloaded {@link AkkEvent AkkEvents}.
+	 * @param events the downloaded events
+	 */
+	private void notifyOnDownloadFinished(AkkEvent[] events) {
+		for (EventDownloadListener l : this.listeners) {
+			l.downloadFinished(events);
+		}
 	}
 	
 	private void addDescriptionToEvent(AkkEvent event) {
