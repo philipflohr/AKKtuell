@@ -1,9 +1,11 @@
 package org.akk.akktuell.Activity;
 
+import java.text.DateFormatSymbols;
+import java.util.GregorianCalendar;
+
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
-import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -41,6 +43,7 @@ public class AKKtuellMainActivity extends Activity  {
 				} else {
 					//this is not a guesture we want to interpret
 				}
+				infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter);
 				AKKtuellMainActivity.this.displayData();
 				return false;
 			}
@@ -74,7 +77,7 @@ public class AKKtuellMainActivity extends Activity  {
     	}
 		View mainView = findViewById(R.id.main_activity_layout);
 		TextView listHeaderMonthName = (TextView) mainView.findViewById(R.id.main_activity_list_header);
-		listHeaderMonthName.setText("TestHeader" + monthCounter);
+		listHeaderMonthName.setText(new DateFormatSymbols().getMonths()[new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter - 1]);
 		AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents(), infoManager);
     	elementListView.setAdapter(adapter);    	
     } 
