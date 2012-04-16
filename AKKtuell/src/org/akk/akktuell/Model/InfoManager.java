@@ -72,10 +72,7 @@ public class InfoManager {
 
 
 	public boolean readyToDisplayData() {
-		if (this.eventsSortedByDate.size() < 10) {
-			return false;
-		}
-		return true;
+		return !this.eventsSortedByDate.isEmpty();
 	}
 	
 	public boolean isInCalendar(AkkEvent event) {
