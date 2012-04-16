@@ -23,11 +23,7 @@ public class AKKtuellMainActivity extends Activity  {
 	private ListView elementListView;
 	private GestureDetector gestureScanner;
 	private int monthCounter;
-<<<<<<< HEAD
 	private static int MIN_SIZE_OF_GESTURE=500;
-=======
-	private static int MAX_SIZE_OF_GESTURE=900;
->>>>>>> 607ee6b723d6556d179872b987f6c714b0b63a3c
 	
 	
     @Override
