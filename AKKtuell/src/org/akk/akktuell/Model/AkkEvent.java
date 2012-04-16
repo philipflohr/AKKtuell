@@ -5,22 +5,37 @@ import java.util.GregorianCalendar;
 import android.net.Uri;
 
 public class AkkEvent {
+	
+	public enum AkkEventType {
+		Schlonz, Workshop, Tanzen, Sonderveranstaltung, Veranstaltungshinweis
+	}
 
 	private final String eventName;
 	
-	private final String eventDescription;
+	private String eventDescription;
 	
 	private final GregorianCalendar eventBeginTime;
 	
-	private final Uri eventPictureUri;
+	private Uri eventPictureUri;
+	
+	private final String eventPlace;
+	
+	private AkkEventType type;
 
-	public AkkEvent(String eventName, String eventdescription, GregorianCalendar eventBeginTime, Uri eventPictureUri) {
+	public AkkEvent(String eventName, GregorianCalendar eventBeginTime, String eventPlace) {
 		this.eventName = eventName;
-		this.eventDescription = eventdescription;
 		this.eventBeginTime = eventBeginTime;
-		this.eventPictureUri = eventPictureUri;
+		this.eventPlace = eventPlace;
 	}
 	
+	public AkkEvent(String string, String string2,
+			GregorianCalendar iso8601ToGregorianCalendar, Uri parse) {
+		this.eventName = string;
+		this.eventBeginTime = iso8601ToGregorianCalendar;
+		this.eventPlace = "test";
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public boolean equals(Object otherEvent) {
 		if (!(otherEvent instanceof AkkEvent)) {
@@ -57,6 +72,14 @@ public class AkkEvent {
 	
 	public GregorianCalendar getEventBeginTime() {
 		return this.eventBeginTime;
+	}
+	
+	public String getPlace() {
+		return this.eventPlace;
+	}
+	
+	public void setDescription(String newDesc) {
+		this.eventDescription = newDesc;
 	}
 	
 }

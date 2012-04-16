@@ -3,9 +3,11 @@ package org.akk.akktuell.Activity;
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
+import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -21,7 +23,11 @@ public class AKKtuellMainActivity extends Activity  {
 	private ListView elementListView;
 	private GestureDetector gestureScanner;
 	private int monthCounter;
+<<<<<<< HEAD
 	private static int MIN_SIZE_OF_GESTURE=500;
+=======
+	private static int MAX_SIZE_OF_GESTURE=900;
+>>>>>>> 607ee6b723d6556d179872b987f6c714b0b63a3c
 	
 	
     @Override
@@ -67,7 +73,7 @@ public class AKKtuellMainActivity extends Activity  {
     }
     
     private void displayData() {
-    	if (!infoManager.readyToDisplayData()) {
+    	while (!infoManager.readyToDisplayData()) {
     		//wait for data update
     	}
 		View mainView = findViewById(R.id.main_activity_layout);
@@ -86,6 +92,14 @@ public class AKKtuellMainActivity extends Activity  {
 	            return true;
 	    }
 	    return super.dispatchTouchEvent(ev);
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		//To speed up the app, the activity is not restarted on screen rotation
+		setContentView(R.layout.main);
+		displayData();
 	}
     
 }
