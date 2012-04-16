@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
@@ -18,13 +19,15 @@ import android.content.Context;
 import android.text.Html;
 import android.util.Log;
 
-public class AkkHomepageEventParser implements Runnable {
+public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	
 	private LinkedList<AkkEvent> eventsWaitingForDescription;
 	private LinkedList<AkkEvent> eventsWaitingForDBPush;
 	private ThreadGroup getDescThreads;
 	private Context context;
 	private InfoManager infoManager;
+	private boolean updateRequested = false;
+	private ArrayList<EventDownloadListener> listeners = new ArrayList<EventDownloadListener>();
 	
 	public AkkHomepageEventParser(Context ctx, InfoManager infoManager) {
 		this.context = ctx;
@@ -330,6 +333,21 @@ public class AkkHomepageEventParser implements Runnable {
 			this.eventsWaitingForDBPush.removeFirst();
 		}
 		return event;
+	}
+
+	@Override
+	public boolean addEventDownloadListener(EventDownloadListener listener) {
+		return this.listeners.add(listener);
+	}
+
+	@Override
+	public boolean removeEventDownloadListener(EventDownloadListener listener) {
+		return this.listeners.remove(listener);
+	}
+
+	@Override
+	public boolean isUpdating() {
+		return this.updateRequested;
 	}
 
 }
