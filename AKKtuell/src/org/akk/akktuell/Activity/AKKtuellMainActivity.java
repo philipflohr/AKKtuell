@@ -38,13 +38,21 @@ public class AKKtuellMainActivity extends Activity  {
 			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 					float velocityY) {
 				if (velocityX > MIN_SIZE_OF_GESTURE) {
-					monthCounter--;
+					if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter - 1)) {
+						monthCounter--;
+					} else {
+						monthCounter = 11 - (new GregorianCalendar().get(GregorianCalendar.MONTH));
+					}
 				} else if (velocityX < -1*MIN_SIZE_OF_GESTURE){
-					monthCounter++;
+					if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter + 1)) {
+						monthCounter++;
+					} else {
+						monthCounter = -(new GregorianCalendar().get(GregorianCalendar.MONTH));
+					}
 				} else {
 					//this is not a guesture we want to interpret
 				}
-				infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter);
+				
 				AKKtuellMainActivity.this.displayData();
 				return false;
 			}

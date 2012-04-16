@@ -95,10 +95,12 @@ public class InfoManager implements EventDownloadListener {
 		return result;
 	}
 	
-	public void setCurrentMonth(int month) {
+	public boolean setCurrentMonth(int month) {
 		if (month >= 0 && month < 12) {
 			currentMonth = month;
+			return true;
 		}
+		return false;
 	}
 
 	@Override
