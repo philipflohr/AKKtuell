@@ -10,7 +10,7 @@ import android.util.Log;
 import org.akk.akktuell.database.*;
 
 
-public class InfoManager {
+public class InfoManager implements EventDownloadListener {
 	
 	private boolean isOnline;
 
@@ -20,11 +20,9 @@ public class InfoManager {
 	
 	private Context applicationContext;
 	
-	private Updater updater;
-	
 	private Thread t;
 	
-	private AkkHomepageEventParser parser;
+	private EventDownloader parser;
 	
 	private Database database;
 	
@@ -38,7 +36,6 @@ public class InfoManager {
 		eventsSortedByDate = new LinkedList<AkkEvent>();
 		//eventsSortedByDate = database.getAllEvents(orderBy, direction);
 		calendar = new CalendarBridge();
-		updater = new Updater(null, null);
 		t = null;
 		
 		//check online state
@@ -54,21 +51,22 @@ public class InfoManager {
 		//finished checking
 		
 		parser = new AkkHomepageEventParser(context, this);
+		parser.addEventDownloadListener(this);
 		parser.updateEvents();
 	}
 	
-	private void updateEvents() {
-		if (this.isOnline) {
-			if (updater.updateNeeded()) {
-				t = new Thread(updater);
-				t.run();
-			} else {
-				Log.d("InfoManager", "No updated required");
-			}
-		} else {
-			Log.d("Updater", "Unable to update: no internet connection");
-		}
-	}
+//	private void updateEvents() {
+//		if (this.isOnline) {
+//			if (updater.updateNeeded()) {
+//				t = new Thread(updater);
+//				t.run();
+//			} else {
+//				Log.d("InfoManager", "No updated required");
+//			}
+//		} else {
+//			Log.d("Updater", "Unable to update: no internet connection");
+//		}
+//	}
 
 
 	public boolean readyToDisplayData() {
@@ -97,13 +95,26 @@ public class InfoManager {
 		return result;
 	}
 	
-	public void addEventToList(AkkEvent event){
-		eventsSortedByDate.addLast(event);
-	}
-	
 	public void setCurrentMonth(int month) {
 		if (month >= 0 && month < 12) {
 			currentMonth = month;
 		}
+	}
+
+	@Override
+	public void appendEvent(AkkEvent event) {
+		eventsSortedByDate.addLast(event);
+	}
+
+	@Override
+	public void downloadStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downloadFinished() {
+		// TODO Auto-generated method stub
+		
 	}
 }
