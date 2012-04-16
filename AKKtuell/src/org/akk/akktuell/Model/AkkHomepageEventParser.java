@@ -74,166 +74,169 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		return str.toString();
 	}
 	
-	public void updateEvents() {
-		String htmlSource;
-		try {
-			htmlSource = getAkkHpSource();
-		} catch (IOException e) {
-			Log.d("AkkHomepageParser", "error while downloading akk source code");
-			e.printStackTrace();
-			AkkEvent[] result = new AkkEvent[1];
-			result[0] = new AkkEvent("Error while downloading", null,"test");
-			this.addElementToDBPushList(result[0]);
-			return;
-		}
-		
-		LinkedList<AkkEvent> events = new LinkedList<AkkEvent>();
-		
-		LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
-		
-		//remove first part
-		singleEventhtmlSource.removeFirst();
-		
-		//save last part for last_modified string
-		String htmlContainingLastModified = singleEventhtmlSource.getLast();
-		singleEventhtmlSource.removeLast();
-		
-		
-		//remove part after "</TD></TR>"
-		for (int i = 0; i < singleEventhtmlSource.size(); i++) {
-			String currentLine = singleEventhtmlSource.get(i).split("</TD></TR>")[0];
-			singleEventhtmlSource.remove(i);
-			singleEventhtmlSource.add(i, currentLine);
-			//equivalent to string.matches but faster for multiple operations
-			
-			
-		}
-		 
-		
-		//produce events from the lines
-		AkkEvent newAkkEvent;
-		String newAkkEventName;
-		String newAkkEventPlace;
-		Boolean hasDescription;
-		GregorianCalendar newAkkEventDate;
-		AkkEvent.AkkEventType newAkkEventType;
-		for (String currentEventString : singleEventhtmlSource) {
-			
-			//check event type
-			if (currentEventString.contains("Veranstaltungshinweis")) {
-				newAkkEventType = AkkEventType.Veranstaltungshinweis;
-			} else if (currentEventString.contains("Sonderveranstaltung")) {
-				newAkkEventType = AkkEventType.Sonderveranstaltung;
-			} else if (currentEventString.contains("Workshop")) {
-				newAkkEventType = AkkEventType.Workshop;
-			} else if (currentEventString.contains("Schlonz") || currentEventString.contains("Liveschlonz")) {
-				newAkkEventType = AkkEventType.Schlonz;
-			} else {
-				newAkkEventType = AkkEventType.Tanzen;
+	@Override
+	public boolean updateEvents() {
+		if (!this.updateRequested) {
+			this.updateRequested = true;
+			String htmlSource;
+			try {
+				htmlSource = getAkkHpSource();
+			} catch (IOException e) {
+				Log.d("AkkHomepageParser", "error while downloading akk source code");
+				e.printStackTrace();
+				AkkEvent[] result = new AkkEvent[1];
+				result[0] = new AkkEvent("Error while downloading", null,"test");
+				this.addElementToDBPushList(result[0]);
+				return false;
 			}
 			
-			//get eventDate
-			newAkkEventDate = getEventDateFromString(currentEventString.substring(0,11));
+			LinkedList<AkkEvent> events = new LinkedList<AkkEvent>();
 			
-			//parse schlonze
+			LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
 			
-			/*
-			 * example source String:
-			 * 	<TR><TD>Do. 19. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
-	        	<A HREF="/schlonze/schlonz.php?Kochduell">Kochduell Schlonz</A></TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
+			//remove first part
+			singleEventhtmlSource.removeFirst();
+			
+			//save last part for last_modified string
+			String htmlContainingLastModified = singleEventhtmlSource.getLast();
+			singleEventhtmlSource.removeLast();
+			
+			
+			//remove part after "</TD></TR>"
+			for (int i = 0; i < singleEventhtmlSource.size(); i++) {
+				String currentLine = singleEventhtmlSource.get(i).split("</TD></TR>")[0];
+				singleEventhtmlSource.remove(i);
+				singleEventhtmlSource.add(i, currentLine);
+				//equivalent to string.matches but faster for multiple operations
+				
+				
+			}
 			 
-			 *
-			 *ohne desc:
-			 *
-			 *<TR><TD>Di. 10. Jul.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
-	        	Reggae-Ska-Punk-Trash Schlonz</TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
-
-			 */
-			if (newAkkEventType == AkkEventType.Schlonz) {
-				if (currentEventString.contains("HREF=\"/schlonze")) {
-					hasDescription = true;
+			
+			//produce events from the lines
+			AkkEvent newAkkEvent;
+			String newAkkEventName;
+			String newAkkEventPlace;
+			Boolean hasDescription;
+			GregorianCalendar newAkkEventDate;
+			AkkEvent.AkkEventType newAkkEventType;
+			for (String currentEventString : singleEventhtmlSource) {
+				
+				//check event type
+				if (currentEventString.contains("Veranstaltungshinweis")) {
+					newAkkEventType = AkkEventType.Veranstaltungshinweis;
+				} else if (currentEventString.contains("Sonderveranstaltung")) {
+					newAkkEventType = AkkEventType.Sonderveranstaltung;
+				} else if (currentEventString.contains("Workshop")) {
+					newAkkEventType = AkkEventType.Workshop;
+				} else if (currentEventString.contains("Schlonz") || currentEventString.contains("Liveschlonz")) {
+					newAkkEventType = AkkEventType.Schlonz;
 				} else {
-					hasDescription = false;
+					newAkkEventType = AkkEventType.Tanzen;
 				}
 				
+				//get eventDate
+				newAkkEventDate = getEventDateFromString(currentEventString.substring(0,11));
 				
+				//parse schlonze
 				
-				try {
-					if (hasDescription) {
-						String source = currentEventString.split("/schlonze")[1];
-						newAkkEventName = source.split("\">")[1];
-						newAkkEventName = newAkkEventName.split("<")[0];
-						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
-						
-						newAkkEventPlace = source.split("adresse.php\">")[1];
-						newAkkEventPlace = newAkkEventPlace.split("<")[0];
-					
-						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-						newAkkEvent.setDescription(currentEventString);
-						newAkkEvent.setType(AkkEventType.Schlonz);
-						this.addElementToWaitingList(newAkkEvent);
+				/*
+				 * example source String:
+				 * 	<TR><TD>Do. 19. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+		        	<A HREF="/schlonze/schlonz.php?Kochduell">Kochduell Schlonz</A></TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
+				 
+				 *
+				 *ohne desc:
+				 *
+				 *<TR><TD>Di. 10. Jul.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+		        	Reggae-Ska-Punk-Trash Schlonz</TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
+	
+				 */
+				if (newAkkEventType == AkkEventType.Schlonz) {
+					if (currentEventString.contains("HREF=\"/schlonze")) {
+						hasDescription = true;
 					} else {
-						String source = currentEventString.split("</SPAN>")[2];
-						newAkkEventName = source.split("</TD><TD>")[1];
-						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+						hasDescription = false;
+					}
 					
-						newAkkEventPlace = source.split("adresse.php\">")[1];
-						newAkkEventPlace = newAkkEventPlace.split("<")[0];
 					
+					
+					try {
+						if (hasDescription) {
+							String source = currentEventString.split("/schlonze")[1];
+							newAkkEventName = source.split("\">")[1];
+							newAkkEventName = newAkkEventName.split("<")[0];
+							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+							
+							newAkkEventPlace = source.split("adresse.php\">")[1];
+							newAkkEventPlace = newAkkEventPlace.split("<")[0];
+						
+							newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+							newAkkEvent.setDescription(currentEventString);
+							newAkkEvent.setType(AkkEventType.Schlonz);
+							this.addElementToWaitingList(newAkkEvent);
+						} else {
+							String source = currentEventString.split("</SPAN>")[2];
+							newAkkEventName = source.split("</TD><TD>")[1];
+							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+						
+							newAkkEventPlace = source.split("adresse.php\">")[1];
+							newAkkEventPlace = newAkkEventPlace.split("<")[0];
+						
+							newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+							newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+							newAkkEvent.setType(AkkEventType.Schlonz);
+							this.addElementToDBPushList(newAkkEvent);
+						}
+						synchronized (this) {
+							notify();
+						}
+						
+					} catch (ArrayIndexOutOfBoundsException e) {
+						Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
+						e.printStackTrace();
+					}
+				} else if (newAkkEventType == AkkEventType.Veranstaltungshinweis) {
+					/*example source
+					 * Mo. 16. Apr.</TD><TD></TD><TD>	Veranstaltungshinweis: Rektor: Vorlesungsbeginn</TD><TD><A HREF="http://www.uni-karlsruhe.de/info/campusplan/">Campus</A>
+					 * 
+					 * 
+					 * Fr. 6. Jul.</TD><TD>15<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+	        			<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Sommerfest</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A></TD></TR>
+					 
+					 *	Sa. 21. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>	<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Konzert - Montreal, Liedfett, Ill</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A>
+					 */
+					
+					if (currentEventString.contains("Rektor")) {
+						
+					} else {
+						if (currentEventString.endsWith("</A>")) {
+							String source = currentEventString.split("\">")[3];
+							newAkkEventName = source.split("</A>")[0];
+							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+							
+							newAkkEventPlace = currentEventString.split("\">")[4];
+							newAkkEventPlace = newAkkEventPlace.substring(0, newAkkEventPlace.length()-3);
+						} else {
+							newAkkEventName = currentEventString.split("</TD><TD>")[2];;
+							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+							
+							newAkkEventPlace = currentEventString.split("</TD><TD>")[3];
+						}
+						if (newAkkEventName.startsWith("\t")) {
+							newAkkEventName = newAkkEventName.substring(1, newAkkEventName.length() -1);
+						}
 						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
 						newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
-						newAkkEvent.setType(AkkEventType.Schlonz);
+						newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
 						this.addElementToDBPushList(newAkkEvent);
-					}
-					synchronized (this) {
-						notify();
-					}
-					
-				} catch (ArrayIndexOutOfBoundsException e) {
-					Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
-					e.printStackTrace();
-				}
-			} else if (newAkkEventType == AkkEventType.Veranstaltungshinweis) {
-				/*example source
-				 * Mo. 16. Apr.</TD><TD></TD><TD>	Veranstaltungshinweis: Rektor: Vorlesungsbeginn</TD><TD><A HREF="http://www.uni-karlsruhe.de/info/campusplan/">Campus</A>
-				 * 
-				 * 
-				 * Fr. 6. Jul.</TD><TD>15<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
-        			<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Sommerfest</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A></TD></TR>
-				 
-				 *	Sa. 21. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>	<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Konzert - Montreal, Liedfett, Ill</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A>
-				 */
-				
-				if (currentEventString.contains("Rektor")) {
-					
-				} else {
-					if (currentEventString.endsWith("</A>")) {
-						String source = currentEventString.split("\">")[3];
-						newAkkEventName = source.split("</A>")[0];
-						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
-						
-						newAkkEventPlace = currentEventString.split("\">")[4];
-						newAkkEventPlace = newAkkEventPlace.substring(0, newAkkEventPlace.length()-3);
-					} else {
-						newAkkEventName = currentEventString.split("</TD><TD>")[2];;
-						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
-						
-						newAkkEventPlace = currentEventString.split("</TD><TD>")[3];
-					}
-					if (newAkkEventName.startsWith("\t")) {
-						newAkkEventName = newAkkEventName.substring(1, newAkkEventName.length() -1);
-					}
-					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-					newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
-					newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
-					this.addElementToDBPushList(newAkkEvent);
-					synchronized (this) {
-						notify();
+						synchronized (this) {
+							notify();
+						}
 					}
 				}
 			}
 		}
-		
 	}
 
 	private GregorianCalendar getEventDateFromString(String substring) {
@@ -295,7 +298,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			if (this.elementsWaitingForDBPush()){
 				event = popElementFromDBPushList();
 				//something to do here?
-				infoManager.addEventToList(event);
+				infoManager.appendEvent(event);
 			} else {
 				try {
 					synchronized (this) {
