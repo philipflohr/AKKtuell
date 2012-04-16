@@ -1,5 +1,6 @@
 package org.akk.akktuell.Model;
 
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -28,6 +29,8 @@ public class InfoManager {
 	private Database database;
 	
 	private LinkedList<AkkEvent> eventsSortedByDate;
+	
+	private int currentMonth = new GregorianCalendar().get(GregorianCalendar.MONTH);
 	
 	public InfoManager(Context context) {
 		applicationContext = context;
@@ -85,13 +88,25 @@ public class InfoManager {
 
 	public AkkEvent[] getEvents() {
 		AkkEvent result[] = new AkkEvent[eventsSortedByDate.size()];
-		for (int i = 0; i < eventsSortedByDate.size(); i++) {
-			result[i] = eventsSortedByDate.get(i);
+		int offset = 0;
+		for (int i = 0; i + offset < eventsSortedByDate.size(); i++) {
+			if (eventsSortedByDate.get(i + offset).getEventBeginTime().get(GregorianCalendar.MONTH) == currentMonth) {
+				result[i] = eventsSortedByDate.get(i + offset);
+			} else {
+				offset++;
+				i--;
+			}
 		}
 		return result;
 	}
 	
 	public void addEventToList(AkkEvent event){
 		eventsSortedByDate.addLast(event);
+	}
+	
+	public void setCurrentMonth(int month) {
+		if (month >= 0 && month < 12) {
+			currentMonth = month;
+		}
 	}
 }

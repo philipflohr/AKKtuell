@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
-import java.util.concurrent.locks.Lock;
-import java.util.regex.Pattern;
 
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
@@ -17,8 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
-import android.graphics.LinearGradient;
-import android.graphics.Paint.Join;
+import android.text.Html;
 import android.util.Log;
 
 public class AkkHomepageEventParser implements Runnable {
@@ -108,19 +105,6 @@ public class AkkHomepageEventParser implements Runnable {
 			
 			
 		}
-		
-		/*
-		 * example source String:
-		 * 	<TR><TD>Do. 19. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
-        	<A HREF="/schlonze/schlonz.php?Kochduell">Kochduell Schlonz</A></TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
-		 
-		 *
-		 *ohne desc:
-		 *
-		 *<TR><TD>Di. 10. Jul.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
-        	Reggae-Ska-Punk-Trash Schlonz</TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
-
-		 */
 		 
 		
 		//produce events from the lines
@@ -149,6 +133,19 @@ public class AkkHomepageEventParser implements Runnable {
 			newAkkEventDate = getEventDateFromString(currentEventString.substring(0,11));
 			
 			//parse schlonze
+			
+			/*
+			 * example source String:
+			 * 	<TR><TD>Do. 19. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+	        	<A HREF="/schlonze/schlonz.php?Kochduell">Kochduell Schlonz</A></TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
+			 
+			 *
+			 *ohne desc:
+			 *
+			 *<TR><TD>Di. 10. Jul.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+	        	Reggae-Ska-Punk-Trash Schlonz</TD><TD><A HREF="/adresse.php">Altes Stadion</A></TD></TR>
+
+			 */
 			if (newAkkEventType == AkkEventType.Schlonz) {
 				if (currentEventString.contains("HREF=\"/schlonze")) {
 					hasDescription = true;
@@ -163,6 +160,7 @@ public class AkkHomepageEventParser implements Runnable {
 						String source = currentEventString.split("/schlonze")[1];
 						newAkkEventName = source.split("\">")[1];
 						newAkkEventName = newAkkEventName.split("<")[0];
+						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
 						
 						newAkkEventPlace = source.split("adresse.php\">")[1];
 						newAkkEventPlace = newAkkEventPlace.split("<")[0];
@@ -173,6 +171,7 @@ public class AkkHomepageEventParser implements Runnable {
 					} else {
 						String source = currentEventString.split("</SPAN>")[2];
 						newAkkEventName = source.split("</TD><TD>")[1];
+						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
 					
 						newAkkEventPlace = source.split("adresse.php\">")[1];
 						newAkkEventPlace = newAkkEventPlace.split("<")[0];
@@ -189,6 +188,8 @@ public class AkkHomepageEventParser implements Runnable {
 					Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
 					e.printStackTrace();
 				}
+			} else if (newAkkEventType == AkkEventType.Sonderveranstaltung) {
+				
 			}
 		}
 		
@@ -246,16 +247,20 @@ public class AkkHomepageEventParser implements Runnable {
 		eventDescriptionSource = "http://www.akk.org" + eventDescriptionSource;
 		try {
 			eventDescriptionSource = getDescriptionSource(eventDescriptionSource);
+			String eventDescription = eventDescriptionSource.split("<P>")[1];
+			eventDescription = Html.fromHtml(eventDescription.split("</P>")[0]).toString();
+			event.setDescription(eventDescription);
 		} catch (IOException e) {
 			Log.d("HPParser", "Could not get event Description...");
 			e.printStackTrace();
 			event.setDescription("Error fetching Description");
 			return;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			Log.d("HPParser", "Could not get event Description...");
+			e.printStackTrace();
+			event.setDescription("Error fetching Description");
+			return;
 		}
-		String eventDescription = eventDescriptionSource.split("<P>")[1];
-		eventDescription = eventDescription.split("</P>")[0];
-		event.setDescription(eventDescription);
-		
 	}
 
 	private boolean elementsWaitingForDBPush() {
