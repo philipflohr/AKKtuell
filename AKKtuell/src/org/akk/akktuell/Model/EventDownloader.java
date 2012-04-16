@@ -8,6 +8,7 @@ import android.provider.ContactsContract.CommonDataKinds.Event;
  *
  */
 public interface EventDownloader {
+
 	/**
 	 * Adds an {@link EventDownloadListener} to the list of listeners.
 	 * @param listener the listener to add.
@@ -24,11 +25,12 @@ public interface EventDownloader {
 
 	/**
 	 * Requests the start of the update of the events.
-	 * If an update process is currently working, false will be returned, true otherwise.
+	 * If an update process is currently working or failed, false will be returned, true otherwise.
 	 * The attached listeners will be informed using the {@link EventDownloadListener#downloadStarted()}
 	 * method.
 	 * @return true, if the process can be started. This does not mean, it will be started immediately.
 	 */
+	//TODO void
 	public boolean updateEvents();
 
 	/**
