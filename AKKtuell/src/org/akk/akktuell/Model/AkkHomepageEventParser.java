@@ -28,8 +28,10 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private InfoManager infoManager;
 	private boolean updateRequested = false;
 	private ArrayList<EventDownloadListener> listeners = new ArrayList<EventDownloadListener>();
+	private Thread mainThread;
 	
 	public AkkHomepageEventParser(Context ctx, InfoManager infoManager) {
+		mainThread = Thread.currentThread();
 		this.context = ctx;
 		this.infoManager = infoManager;
 		this.eventsWaitingForDescription = new LinkedList<AkkEvent>();
@@ -235,6 +237,24 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 						}
 					}
 				}
+				
+				
+				while(elementsWaitingForDesc() || getDescThreads.activeCount() > 0) {
+					synchronized (this) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				
+				AkkEvent[] result = new AkkEvent[this.eventsWaitingForDBPush.size()];
+				for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
+					result[i] = eventsWaitingForDBPush.get(i);
+				}
+				notifyOnDownloadFinished(result);
 			}
 		}
 		return updateRequested;
@@ -295,14 +315,10 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 					addDescriptionToEvent(event);
 					this.addElementToDBPushList(event);
 				}
-			} 
-			if (this.elementsWaitingForDBPush()){
-				event = popElementFromDBPushList();
-				//something to do here?
-				infoManager.appendEvent(event);
 			} else {
 				try {
 					synchronized (this) {
+						mainThread.notify();
 						wait();
 					}
 				} catch (InterruptedException e) {

@@ -26,7 +26,7 @@ public class AKKtuellMainActivity extends Activity  {
 	private ListView elementListView;
 	private GestureDetector gestureScanner;
 	private int monthCounter;
-	private static int MIN_SIZE_OF_GESTURE=500;
+	private static int MIN_SIZE_OF_GESTURE=800;
 	
 	
     @Override
@@ -86,7 +86,7 @@ public class AKKtuellMainActivity extends Activity  {
     	}
 		View mainView = findViewById(R.id.main_activity_layout);
 		TextView listHeaderMonthName = (TextView) mainView.findViewById(R.id.main_activity_list_header);
-		listHeaderMonthName.setText(new DateFormatSymbols().getMonths()[new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter - 1]);
+		listHeaderMonthName.setText(new DateFormatSymbols().getMonths()[new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter]);
 		AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents(), infoManager);
     	elementListView.setAdapter(adapter);    	
     } 
