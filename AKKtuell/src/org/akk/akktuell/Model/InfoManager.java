@@ -50,7 +50,7 @@ public class InfoManager implements EventDownloadListener {
 		}
 		//finished checking
 		
-		parser = new AkkHomepageEventParser(context, this);
+		parser = new AkkHomepageEventParser(context);
 		parser.addEventDownloadListener(this);
 		parser.updateEvents();
 	}
@@ -104,19 +104,15 @@ public class InfoManager implements EventDownloadListener {
 	}
 
 	@Override
-	public void appendEvent(AkkEvent event) {
-		eventsSortedByDate.addLast(event);
-	}
-
-	@Override
 	public void downloadStarted() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void downloadFinished() {
-		// TODO Auto-generated method stub
-		
+	public void downloadFinished(AkkEvent[] events) {
+		for (AkkEvent e : events) {
+			eventsSortedByDate.addLast(e);
+		}
 	}
 }
