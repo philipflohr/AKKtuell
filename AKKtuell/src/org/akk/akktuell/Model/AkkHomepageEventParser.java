@@ -167,6 +167,7 @@ public class AkkHomepageEventParser implements Runnable {
 					
 						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
 						newAkkEvent.setDescription(currentEventString);
+						newAkkEvent.setType(AkkEventType.Schlonz);
 						this.addElementToWaitingList(newAkkEvent);
 					} else {
 						String source = currentEventString.split("</SPAN>")[2];
@@ -178,6 +179,7 @@ public class AkkHomepageEventParser implements Runnable {
 					
 						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
 						newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+						newAkkEvent.setType(AkkEventType.Schlonz);
 						this.addElementToDBPushList(newAkkEvent);
 					}
 					synchronized (this) {
@@ -188,8 +190,44 @@ public class AkkHomepageEventParser implements Runnable {
 					Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
 					e.printStackTrace();
 				}
-			} else if (newAkkEventType == AkkEventType.Sonderveranstaltung) {
+			} else if (newAkkEventType == AkkEventType.Veranstaltungshinweis) {
+				/*example source
+				 * Mo. 16. Apr.</TD><TD></TD><TD>	Veranstaltungshinweis: Rektor: Vorlesungsbeginn</TD><TD><A HREF="http://www.uni-karlsruhe.de/info/campusplan/">Campus</A>
+				 * 
+				 * 
+				 * Fr. 6. Jul.</TD><TD>15<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>
+        			<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Sommerfest</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A></TD></TR>
+				 
+				 *	Sa. 21. Apr.</TD><TD>20<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD>	<A HREF="http://www.z10.info/">Veranstaltungshinweis: Z10: Konzert - Montreal, Liedfett, Ill</A></TD><TD><A HREF="http://www.z10.info/?topic">Z10</A>
+				 */
 				
+				if (currentEventString.contains("Rektor")) {
+					
+				} else {
+					if (currentEventString.endsWith("</A>")) {
+						String source = currentEventString.split("\">")[3];
+						newAkkEventName = source.split("</A>")[0];
+						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+						
+						newAkkEventPlace = currentEventString.split("\">")[4];
+						newAkkEventPlace = newAkkEventPlace.substring(0, newAkkEventPlace.length()-3);
+					} else {
+						newAkkEventName = currentEventString.split("</TD><TD>")[2];;
+						newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+						
+						newAkkEventPlace = currentEventString.split("</TD><TD>")[3];
+					}
+					if (newAkkEventName.startsWith("\t")) {
+						newAkkEventName = newAkkEventName.substring(1, newAkkEventName.length() -1);
+					}
+					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+					newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+					newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
+					this.addElementToDBPushList(newAkkEvent);
+					synchronized (this) {
+						notify();
+					}
+				}
 			}
 		}
 		

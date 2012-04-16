@@ -20,7 +20,7 @@ public class AkkEvent {
 	
 	private final String eventPlace;
 	
-	private AkkEventType type;
+	private AkkEventType type = null;
 
 	public AkkEvent(String eventName, GregorianCalendar eventBeginTime, String eventPlace) {
 		this.eventName = eventName;
@@ -80,6 +80,14 @@ public class AkkEvent {
 	
 	public void setDescription(String newDesc) {
 		this.eventDescription = newDesc;
+	}
+
+	public AkkEventType getEventType() {
+		return this.type;
+	}
+	
+	public void setType(AkkEventType type) {
+		this.type = type;
 	}
 	
 }

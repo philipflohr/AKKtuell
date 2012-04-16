@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.akk.akktuell.Model.InfoManager;
 
 import android.app.Activity;
@@ -58,7 +59,7 @@ public class AKKtuellMainActivity extends Activity  {
         	public void onItemClick(AdapterView<?> parent, View view,
         			int position, long id) {
         			AkkEvent clickedEvent = (AkkEvent) AKKtuellMainActivity.this.elementListView.getAdapter().getItem(position);
-        			if (clickedEvent != null) {
+        			if (clickedEvent != null && !(clickedEvent.getEventType() == AkkEventType.Veranstaltungshinweis)) {
         				Intent intent = new Intent(AKKtuellMainActivity.this,AKKtuellEventView.class);
         				intent.putExtra("EVENT_NAME", clickedEvent.getEventName());
         				intent.putExtra("EVENT_DATE", "test");
