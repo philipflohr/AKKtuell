@@ -184,7 +184,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEventPlace = newAkkEventPlace.split("<")[0];
 						
 							newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-							newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+							newAkkEvent.setDescription(context.getResources().getString(R.string.hello));
 							newAkkEvent.setType(AkkEventType.Schlonz);
 							this.addElementToDBPushList(newAkkEvent);
 						}
@@ -227,7 +227,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEventName = newAkkEventName.substring(1, newAkkEventName.length() -1);
 						}
 						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-						newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+						newAkkEvent.setDescription(context.getResources().getString(R.string.hello));
 						newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
 						this.addElementToDBPushList(newAkkEvent);
 						synchronized (this) {
@@ -237,6 +237,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				}
 			}
 		}
+		return updateRequested;
 	}
 
 	private GregorianCalendar getEventDateFromString(String substring) {
