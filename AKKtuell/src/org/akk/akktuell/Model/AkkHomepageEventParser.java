@@ -196,8 +196,35 @@ public class AkkHomepageEventParser implements Runnable {
 	}
 
 	private GregorianCalendar getEventDateFromString(String substring) {
-		// TODO Auto-generated method stub
-		return null;
+		GregorianCalendar calendar = new GregorianCalendar();
+		if (substring.contains("Jan")) {
+			calendar.set(GregorianCalendar.MONTH, 0);
+		} else if (substring.contains("Feb")) {
+			calendar.set(GregorianCalendar.MONTH, 1);
+		} else if (substring.contains("Mar")) {
+			calendar.set(GregorianCalendar.MONTH, 2);
+		} else if (substring.contains("Apr")) {
+			calendar.set(GregorianCalendar.MONTH, 3);
+		} else if (substring.contains("Mai")) {
+			calendar.set(GregorianCalendar.MONTH, 4);
+		} else if (substring.contains("Jun")) {
+			calendar.set(GregorianCalendar.MONTH, 5);
+		} else if (substring.contains("Jul")) {
+			calendar.set(GregorianCalendar.MONTH, 6);
+		} else if (substring.contains("Aug")) {
+			calendar.set(GregorianCalendar.MONTH, 7);
+		} else if (substring.contains("Sep")) {
+			calendar.set(GregorianCalendar.MONTH, 8);
+		} else if (substring.contains("Okt")) {
+			calendar.set(GregorianCalendar.MONTH, 9);
+		} else if (substring.contains("Nov")) {
+			calendar.set(GregorianCalendar.MONTH, 10);
+		} else if (substring.contains("Dez")) {
+			calendar.set(GregorianCalendar.MONTH, 11);
+		} else {
+			Log.d("Halt", "STOP!");
+		}
+		return calendar;
 	}
 
 	private LinkedList<String> getSingleEventSources(String htmlSource) {

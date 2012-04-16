@@ -87,15 +87,15 @@ public class InfoManager {
 	}
 
 	public AkkEvent[] getEvents() {
-		AkkEvent result[] = new AkkEvent[eventsSortedByDate.size()];
-		int offset = 0;
-		for (int i = 0; i + offset < eventsSortedByDate.size(); i++) {
-			if (eventsSortedByDate.get(i + offset).getEventBeginTime().get(GregorianCalendar.MONTH) == currentMonth) {
-				result[i] = eventsSortedByDate.get(i + offset);
-			} else {
-				offset++;
-				i--;
+		LinkedList<AkkEvent> resultList = new LinkedList<AkkEvent>();
+		for (AkkEvent event : eventsSortedByDate) {
+			if (event.getEventBeginTime().get(GregorianCalendar.MONTH) == currentMonth) {
+				resultList.add(event);
 			}
+		}
+		AkkEvent result[] = new AkkEvent[resultList.size()];
+		for (int i = 0; i < resultList.size(); i++) {
+			result[i] = resultList.get(i);
 		}
 		return result;
 	}
