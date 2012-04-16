@@ -76,9 +76,7 @@ public class AKKtuellMainActivity extends Activity  {
 		TextView listHeaderMonthName = (TextView) mainView.findViewById(R.id.main_activity_list_header);
 		listHeaderMonthName.setText("TestHeader" + monthCounter);
     	AkkEventAdapter adapter = new AkkEventAdapter(getApplicationContext(), infoManager.getEvents(), infoManager);
-    	elementListView.setAdapter(adapter);
-    	
-    	
+    	elementListView.setAdapter(adapter);    	
     } 
     
 	@Override

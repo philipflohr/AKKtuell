@@ -69,7 +69,7 @@ public class InfoManager {
 
 
 	public boolean readyToDisplayData() {
-		if (this.eventsSortedByDate.size() < 30) {
+		if (this.eventsSortedByDate.size() < 10) {
 			return false;
 		}
 		return true;

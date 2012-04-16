@@ -10,6 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.regex.Pattern;
 
 import org.akk.akktuell.R;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -42,6 +43,23 @@ public class AkkHomepageEventParser implements Runnable {
 	private String getAkkHpSource() throws IOException {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet request = new HttpGet("http://www.akk.org/chronologie.php");
+		HttpResponse response = client.execute(request);
+
+		InputStream in = response.getEntity().getContent();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		StringBuilder str = new StringBuilder();
+		String line = null;
+		while((line = reader.readLine()) != null)
+		{
+		    str.append(line);
+		}
+		in.close();
+		return str.toString();
+	}
+	
+	private String getDescriptionSource(String link) throws IOException {
+		HttpClient client = new DefaultHttpClient();
+		HttpGet request = new HttpGet(link);
 		HttpResponse response = client.execute(request);
 
 		InputStream in = response.getEntity().getContent();
@@ -111,46 +129,66 @@ public class AkkHomepageEventParser implements Runnable {
 		String newAkkEventPlace;
 		Boolean hasDescription;
 		GregorianCalendar newAkkEventDate;
+		AkkEvent.AkkEventType newAkkEventType;
 		for (String currentEventString : singleEventhtmlSource) {
-			newAkkEventDate = getEventDateFromString(currentEventString.substring(0,11));
-			if (currentEventString.contains("HREF=\"/schlonze")) {
-				hasDescription = true;
+			
+			//check event type
+			if (currentEventString.contains("Veranstaltungshinweis")) {
+				newAkkEventType = AkkEventType.Veranstaltungshinweis;
+			} else if (currentEventString.contains("Sonderveranstaltung")) {
+				newAkkEventType = AkkEventType.Sonderveranstaltung;
+			} else if (currentEventString.contains("Workshop")) {
+				newAkkEventType = AkkEventType.Workshop;
+			} else if (currentEventString.contains("Schlonz") || currentEventString.contains("Liveschlonz")) {
+				newAkkEventType = AkkEventType.Schlonz;
 			} else {
-				hasDescription = false;
+				newAkkEventType = AkkEventType.Tanzen;
 			}
 			
+			//get eventDate
+			newAkkEventDate = getEventDateFromString(currentEventString.substring(0,11));
 			
-			
-			try {
-				if (hasDescription) {
-					String source = currentEventString.split("/schlonze")[1];
-					newAkkEventName = source.split("\">")[1];
-					newAkkEventName = newAkkEventName.split("<")[0];
-					
-					newAkkEventPlace = source.split("adresse.php\">")[1];
-					newAkkEventPlace = newAkkEventPlace.split("<")[0];
-				
-					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-					newAkkEvent.setDescription(currentEventString);
-					this.addElementToWaitingList(newAkkEvent);
+			//parse schlonze
+			if (newAkkEventType == AkkEventType.Schlonz) {
+				if (currentEventString.contains("HREF=\"/schlonze")) {
+					hasDescription = true;
 				} else {
-					String source = currentEventString.split("</SPAN>")[2];
-					newAkkEventName = source.split("</TD><TD>")[1];
-				
-					newAkkEventPlace = source.split("adresse.php\">")[1];
-					newAkkEventPlace = newAkkEventPlace.split("<")[0];
-				
-					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
-					newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
-					this.addElementToDBPushList(newAkkEvent);
-				}
-				synchronized (this) {
-					notify();
+					hasDescription = false;
 				}
 				
-			} catch (ArrayIndexOutOfBoundsException e) {
-				Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
-				e.printStackTrace();
+				
+				
+				try {
+					if (hasDescription) {
+						String source = currentEventString.split("/schlonze")[1];
+						newAkkEventName = source.split("\">")[1];
+						newAkkEventName = newAkkEventName.split("<")[0];
+						
+						newAkkEventPlace = source.split("adresse.php\">")[1];
+						newAkkEventPlace = newAkkEventPlace.split("<")[0];
+					
+						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+						newAkkEvent.setDescription(currentEventString);
+						this.addElementToWaitingList(newAkkEvent);
+					} else {
+						String source = currentEventString.split("</SPAN>")[2];
+						newAkkEventName = source.split("</TD><TD>")[1];
+					
+						newAkkEventPlace = source.split("adresse.php\">")[1];
+						newAkkEventPlace = newAkkEventPlace.split("<")[0];
+					
+						newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+						newAkkEvent.setDescription(context.getResources().getString(R.string.no_description_available));
+						this.addElementToDBPushList(newAkkEvent);
+					}
+					synchronized (this) {
+						notify();
+					}
+					
+				} catch (ArrayIndexOutOfBoundsException e) {
+					Log.d("HPParser", "Seems this is not a normal String: " + currentEventString);
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -172,14 +210,22 @@ public class AkkHomepageEventParser implements Runnable {
 	
 	
 	public void run() {
-		AkkEvent event;
+		AkkEvent event = null;
 		while (true) {
 			if (this.elementsWaitingForDesc()) {
-				Log.d("Thread:" + Thread.currentThread().toString(), "alive");
-				event = this.popElementFromwaitingList();
-				this.addElementToDBPushList(event);
-			} else if (this.elementsWaitingForDBPush()){
+				synchronized (this) {
+					if (this.elementsWaitingForDesc()) {
+						event = this.popElementFromwaitingList();
+					}
+				}
+				if (event != null) {
+					addDescriptionToEvent(event);
+					this.addElementToDBPushList(event);
+				}
+			} 
+			if (this.elementsWaitingForDBPush()){
 				event = popElementFromDBPushList();
+				//something to do here?
 				infoManager.addEventToList(event);
 			} else {
 				try {
@@ -193,6 +239,25 @@ public class AkkHomepageEventParser implements Runnable {
 		}	
 	}
 	
+	private void addDescriptionToEvent(AkkEvent event) {
+		String eventSource = event.getEventDescription();
+		eventSource = eventSource.split("<A HREF=\"")[1];
+		String eventDescriptionSource = eventSource.split("\">")[0];
+		eventDescriptionSource = "http://www.akk.org" + eventDescriptionSource;
+		try {
+			eventDescriptionSource = getDescriptionSource(eventDescriptionSource);
+		} catch (IOException e) {
+			Log.d("HPParser", "Could not get event Description...");
+			e.printStackTrace();
+			event.setDescription("Error fetching Description");
+			return;
+		}
+		String eventDescription = eventDescriptionSource.split("<P>")[1];
+		eventDescription = eventDescription.split("</P>")[0];
+		event.setDescription(eventDescription);
+		
+	}
+
 	private boolean elementsWaitingForDBPush() {
 		synchronized (this) {
 			return !this.eventsWaitingForDBPush.isEmpty();
