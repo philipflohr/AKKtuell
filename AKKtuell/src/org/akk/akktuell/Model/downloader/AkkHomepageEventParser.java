@@ -30,6 +30,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private ArrayList<EventDownloadListener> listeners = new ArrayList<EventDownloadListener>();
 	private Thread mainThread;
 	private boolean allEventsParsed;
+	private String AkkHpAddr = "http://www.akk.org/chronologie.php";
 	
 	public AkkHomepageEventParser(Context ctx) {
 		mainThread = Thread.currentThread();
@@ -50,7 +51,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		
 		
 		HttpClient client = new DefaultHttpClient();
-		HttpGet request = new HttpGet("http://www.akk.org/chronologie.php");
+		HttpGet request = new HttpGet(AkkHpAddr);
 		HttpResponse response = client.execute(request);
 
 		InputStream in = response.getEntity().getContent();
@@ -83,7 +84,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 	@Override
-	public boolean updateEvents() {
+	public AkkEvent[] updateEvents() {
 		if (!this.updateRequested) {
 			this.updateRequested = true;
 			String htmlSource;
@@ -92,10 +93,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			} catch (IOException e) {
 				Log.d("AkkHomepageParser", "error while downloading akk source code");
 				e.printStackTrace();
-				AkkEvent[] result = new AkkEvent[1];
-				result[0] = new AkkEvent("Error while downloading", null,"test");
-				this.addElementToDBPushList(result[0]);
-				return false;
+				return null;
 			}
 			
 			LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
@@ -251,13 +249,17 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				}
 			}
 			
+			if (this.eventsWaitingForDBPush.size() == 0) {
+				return null;
+			}
+			
 			AkkEvent[] result = new AkkEvent[this.eventsWaitingForDBPush.size()];
 			for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
 				result[i] = eventsWaitingForDBPush.get(i);
 			}
-			notifyOnDownloadFinished(result);
+			return result;
 		}
-		return updateRequested;
+		return null;
 	}
 
 	private GregorianCalendar getEventDateFromString(String substring) {
@@ -434,6 +436,11 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	@Override
 	public boolean isUpdating() {
 		return this.updateRequested;
+	}
+
+	@Override
+	public void setUrl(String url) {
+		this.AkkHpAddr = url;
 	}
 
 }
