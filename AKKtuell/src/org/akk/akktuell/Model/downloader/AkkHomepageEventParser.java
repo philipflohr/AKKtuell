@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
+import org.akk.akktuell.Model.InfoManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -257,6 +258,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
 				result[i] = eventsWaitingForDBPush.get(i);
 			}
+			notifyOnDownloadFinished(result);
 			return result;
 		}
 		return null;
@@ -431,6 +433,11 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	@Override
 	public void setUrl(String url) {
 		this.AkkHpAddr = url;
+	}
+	
+
+	public void addEventDownloadListener(InfoManager infoManager) {
+		listeners.add(infoManager);
 	}
 
 }

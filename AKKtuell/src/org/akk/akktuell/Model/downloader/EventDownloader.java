@@ -1,6 +1,7 @@
 package org.akk.akktuell.Model.downloader;
 
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.InfoManager;
 
 import android.provider.ContactsContract.CommonDataKinds.Event;
 
@@ -31,4 +32,6 @@ public interface EventDownloader {
 	 * @param url the url to use.
 	 */
 	public void setUrl(String url);
+
+	public void addEventDownloadListener(InfoManager infoManager);
 }

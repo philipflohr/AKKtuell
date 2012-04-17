@@ -2,7 +2,11 @@ package org.akk.akktuell.Model.downloader;
 
 import java.util.ArrayList;
 
+import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.InfoManager;
+
 import android.content.Context;
+import android.util.Log;
 
 public class EventDownloadManager implements EventDownloader {
 	
@@ -39,38 +43,31 @@ public class EventDownloadManager implements EventDownloader {
 	}
 
 	@Override
-	public boolean addEventDownloadListener(EventDownloadListener listener) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean removeEventDownloadListener(EventDownloadListener listener) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean updateEvents() {
+	public AkkEvent[] updateEvents() {
 		while (downloader.size() > 0 && (
 				unsuccessfullDownloadAttempts <= downloadAttemptLimit
 					|| untilSuccess)
 				) {
 			this.currentDownloader = downloader.get(unsuccessfullDownloadAttempts % this.downloader.size());
 
-			if (this.currentDownloader.updateEvents()) {
+			if (this.currentDownloader.updateEvents() != null) {
 				this.unsuccessfullDownloadAttempts = 0;
-				return true;
+				return null;
 			} else {
 				unsuccessfullDownloadAttempts++;
 			}			
 		}
-		return false;
+		return null;
 	}
 
 	@Override
 	public boolean isUpdating() {
-		return (currentDownloader != null) ? currentDownloader.isUpdating() : false;
+		try {
+			return (currentDownloader != null) ? currentDownloader.isUpdating() : false;
+		} catch (LinkNotSetException e) {
+			Log.d("EventDownloadManager", "Link not set...");
+			return false;
+		}
 	}
 
 	private class Downloader {
@@ -83,6 +80,18 @@ public class EventDownloadManager implements EventDownloader {
 		}
 
 		
+		
+	}
+
+	@Override
+	public void setUrl(String url) {
+		// nothing to do?
+		
+	}
+
+	@Override
+	public void addEventDownloadListener(InfoManager infoManager) {
+		// TODO Auto-generated method stub
 		
 	}
 }
