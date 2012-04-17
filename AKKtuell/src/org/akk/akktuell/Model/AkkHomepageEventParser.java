@@ -28,6 +28,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private boolean updateRequested = false;
 	private ArrayList<EventDownloadListener> listeners = new ArrayList<EventDownloadListener>();
 	private Thread mainThread;
+	private boolean allEventsParsed;
 	
 	public AkkHomepageEventParser(Context ctx) {
 		mainThread = Thread.currentThread();
@@ -36,12 +37,17 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		this.eventsWaitingForDescription = new LinkedList<AkkEvent>();
 		this.eventsWaitingForDBPush = new LinkedList<AkkEvent>();
 		getDescThreads = new ThreadGroup("EventUpdateThreads");
-		for (int i = 0; i < 3; i++) {
-			new Thread(getDescThreads, this).start();
-		}
 	}
 	
 	private String getAkkHpSource() throws IOException {
+		allEventsParsed = false;
+		//create DescriptionUpdateThreads
+
+		for (int i = 0; i < 3; i++) {
+			new Thread(getDescThreads, this).start();
+		}
+		
+		
 		HttpClient client = new DefaultHttpClient();
 		HttpGet request = new HttpGet("http://www.akk.org/chronologie.php");
 		HttpResponse response = client.execute(request);
@@ -231,30 +237,26 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 						newAkkEvent.setDescription(context.getResources().getString(R.string.hello));
 						newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
 						this.addElementToDBPushList(newAkkEvent);
-						synchronized (this) {
-							notify();
-						}
 					}
-				}
-				
-				
-				while(elementsWaitingForDesc() || getDescThreads.activeCount() > 0) {
-					synchronized (this) {
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-				
-				AkkEvent[] result = new AkkEvent[this.eventsWaitingForDBPush.size()];
-				for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
-					result[i] = eventsWaitingForDBPush.get(i);
-				}
-				notifyOnDownloadFinished(result);
+				}	
 			}
+			allEventsParsed = true;
+			while(elementsWaitingForDesc() || getDescThreads.activeCount() > 0) {
+				synchronized (this) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			AkkEvent[] result = new AkkEvent[this.eventsWaitingForDBPush.size()];
+			for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
+				result[i] = eventsWaitingForDBPush.get(i);
+			}
+			notifyOnDownloadFinished(result);
 		}
 		return updateRequested;
 	}
@@ -315,13 +317,21 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 					this.addElementToDBPushList(event);
 				}
 			} else {
-				try {
-					synchronized (this) {
+				synchronized (mainThread) {
+					if (mainThread.getState() == Thread.State.WAITING) {
 						mainThread.notify();
-						wait();
 					}
-				} catch (InterruptedException e) {
-					Log.d("AkkHomepageParse", "Thread got InterrupterException.");
+				}
+				if (!allEventsParsed) {
+					synchronized (this) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							Log.d("AkkHomepageParse", "Thread got InterrupterException.");
+						} 
+					}
+				} else {
+					break;
 				}
 			}
 		}	
