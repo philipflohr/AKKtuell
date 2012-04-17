@@ -7,6 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import org.akk.akktuell.Model.downloader.AkkHomepageEventParser;
+import org.akk.akktuell.Model.downloader.EventDownloadListener;
+import org.akk.akktuell.Model.downloader.EventDownloader;
 import org.akk.akktuell.database.*;
 
 
