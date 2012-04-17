@@ -10,27 +10,10 @@ import android.provider.ContactsContract.CommonDataKinds.Event;
  *
  */
 public interface EventDownloader {
-
 	/**
-	 * Adds an {@link EventDownloadListener} to the list of listeners.
-	 * @param listener the listener to add.
-	 * @return true, if the listener has been added successfully.
-	 */
-	public boolean addEventDownloadListener(EventDownloadListener listener);
-
-	/**
-	 * Removes the given {@link EventDownloadListener} from the list of listeners.
-	 * @param listener the listener to remove.
-	 * @return true, if the listener has been removed successfully.
-	 */
-	public boolean removeEventDownloadListener(EventDownloadListener listener);
-
-	/**
-	 * Requests the start of the update of the events.
-	 * If an update process is currently working or failed, false will be returned, true otherwise.
-	 * The attached listeners will be informed using the {@link EventDownloadListener#downloadStarted()}
-	 * method.
-	 * @return true, if the process can be started. This does not mean, it will be started immediately.
+	 * Starts the update process and returns the events found.
+	 * If null is returned, something went wrong (not reachable, etc.)
+	 * @return the events found.
 	 */
 	//TODO void
 	public AkkEvent[] updateEvents();
@@ -40,10 +23,12 @@ public interface EventDownloader {
 	 * This can be used to avoid interrupting an update process (e.g. on App shutdown).
 	 * @return true, if an update has been requested.
 	 */
-	public boolean isUpdating();
+	public boolean isUpdating() throws LinkNotSetException;
 
+	/**
+	 * Sets the URL pointing to the address to use.
+	 * This has to be called at least once before using the {@link #updateEvents()} method.
+	 * @param url the url to use.
+	 */
 	public void setUrl(String url);
-
-	
-	}
 }
