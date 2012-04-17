@@ -424,16 +424,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 
 	@Override
-	public boolean addEventDownloadListener(EventDownloadListener listener) {
-		return this.listeners.add(listener);
-	}
-
-	@Override
-	public boolean removeEventDownloadListener(EventDownloadListener listener) {
-		return this.listeners.remove(listener);
-	}
-
-	@Override
 	public boolean isUpdating() {
 		return this.updateRequested;
 	}
