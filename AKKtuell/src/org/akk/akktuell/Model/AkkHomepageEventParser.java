@@ -97,8 +97,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				return false;
 			}
 			
-			LinkedList<AkkEvent> events = new LinkedList<AkkEvent>();
-			
 			LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
 			
 			//remove first part
