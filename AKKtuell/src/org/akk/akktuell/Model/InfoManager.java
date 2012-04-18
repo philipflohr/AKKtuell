@@ -7,13 +7,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import org.akk.akktuell.Activity.AKKtuellEventView;
 import org.akk.akktuell.Model.downloader.AkkHomepageEventParser;
 import org.akk.akktuell.Model.downloader.EventDownloadListener;
 import org.akk.akktuell.Model.downloader.EventDownloader;
 import org.akk.akktuell.database.*;
 
 
-public class InfoManager implements EventDownloadListener {
+public class InfoManager implements Runnable, EventDownloadListener {
 	
 	private boolean isOnline;
 
@@ -23,7 +24,7 @@ public class InfoManager implements EventDownloadListener {
 	
 	private Context applicationContext;
 	
-	private Thread t;
+	private Thread databaseManager;
 	
 	private EventDownloader parser;
 	
@@ -35,11 +36,17 @@ public class InfoManager implements EventDownloadListener {
 	
 	public InfoManager(Context context) {
 		applicationContext = context;
-		database = Database.getInstance(context);
 		eventsSortedByDate = new LinkedList<AkkEvent>();
-		//eventsSortedByDate = database.getAllEvents(orderBy, direction);
+		database = Database.getInstance(context);
+		try {
+			database.open();
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		calendar = new CalendarBridge();
-		t = null;
+		databaseManager = new Thread(this);
+		databaseManager.start();
 		
 		//check online state
 		this.isOnline = false;
@@ -114,8 +121,47 @@ public class InfoManager implements EventDownloadListener {
 
 	@Override
 	public void downloadFinished(AkkEvent[] events) {
-		for (AkkEvent e : events) {
-			eventsSortedByDate.addLast(e);
+		synchronized (this) {
+			for (AkkEvent e : events) {
+				if (!eventsSortedByDate.contains(e)) {
+					eventsSortedByDate.addLast(e);
+					synchronized (databaseManager) {
+						databaseManager.notify();
+					}
+				}
+				
+			}
 		}
+		
+	}
+
+	@Override
+	public void run() {
+		AkkEvent[] events = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.DESCENDING);
+		downloadFinished(events);
+		
+		while (true)
+		{
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			try {
+				database.insertAkkEvent(eventsSortedByDate.getLast());
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	public void finish() {
+		database.close();
 	}
 }

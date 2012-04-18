@@ -99,6 +99,11 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			
 			LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
 			
+			if (singleEventhtmlSource.size() < 3) {
+				//this is not a correct version of the akk homepage
+				return null;
+			}
+			
 			//remove first part
 			singleEventhtmlSource.removeFirst();
 			

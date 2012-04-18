@@ -108,4 +108,8 @@ public class AKKtuellMainActivity extends Activity  {
 		displayData();
 	}
     
+	@Override
+	public void finish() {
+		infoManager.finish();
+	}
 }
