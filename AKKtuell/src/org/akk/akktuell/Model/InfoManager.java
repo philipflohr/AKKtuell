@@ -125,8 +125,11 @@ public class InfoManager implements Runnable, EventDownloadListener {
 			for (AkkEvent e : events) {
 				if (!eventsSortedByDate.contains(e)) {
 					eventsSortedByDate.addLast(e);
-					synchronized (databaseManager) {
-						databaseManager.notify();
+					try {
+						database.insertAkkEvent(eventsSortedByDate.getLast());
+					} catch (DBException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
 				
