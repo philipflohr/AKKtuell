@@ -50,6 +50,20 @@ public interface DBInterface {
 	public boolean insertAkkEvents(AkkEvent[] events) throws DBException;
 
 	/**
+	 * This method takes a set of {@link AkkEvent AkkEvents} and inserts them into
+	 * the database.
+	 * Existing {@link AkkEvent AkkEvents} will be kept, updated events will be
+	 * inserted and events without a match will be flushed.
+	 * Inserting will be stopped in case an error occurred.
+	 * Returns true if the event was added successfully.
+	 * This method will automatically avoid the creation of duplicates.
+	 * @param event the event to insert.
+	 * @return true, if successful.
+	 * @throws DBException in case the event could not be inserted.
+	 */
+	public boolean updateAkkEventsAndFlush(AkkEvent[] events) throws DBException;
+
+	/**
 	 * Inserts the given {@code eventName}, {@code eventDescription},
 	 * {@code eventBeginTime} and {@code eventUri} into the database.
 	 * Returns true if the event was added successfully.
@@ -62,7 +76,7 @@ public interface DBInterface {
 	 * @throws DBException in case the event could not be inserted.
 	 */
 	public boolean insertEvent(String eventName, String eventDescription,
-			GregorianCalendar eventBeginTime,
+			String eventType, GregorianCalendar eventBeginTime,
 			Uri eventPictureUri) throws DBException;
 
 	/**
@@ -89,6 +103,15 @@ public interface DBInterface {
 	 * @return number of affected database entries.
 	 */
 	public int deleteAllEventsBefore(GregorianCalendar date);
+
+	/**
+	 * Deletes all events that have been inserted before the given timestamp.
+	 * Events inserted at the given date will NOT be deleted.
+	 * Returns the number of database entries affected by this call.
+	 * @param timestamp delete all events before timestamp.
+	 * @return number of affected database entries.
+	 */
+	public int deleteAllEventsInsertedBefore(long timestamp);
 
 	/**
 	 * Deletes all events in the database and returns the number of deleted events.
