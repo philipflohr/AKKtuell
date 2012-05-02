@@ -225,8 +225,9 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEventName = source.split("</A>")[0];
 							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
 							
-							newAkkEventPlace = currentEventString.split("\">")[4];
-							newAkkEventPlace = newAkkEventPlace.substring(0, newAkkEventPlace.length()-3);
+							String [] substrings = currentEventString.split("\">");
+							newAkkEventPlace = substrings[substrings.length -1];
+							newAkkEventPlace = newAkkEventPlace.substring(0, newAkkEventPlace.length()-4);
 						} else {
 							newAkkEventName = currentEventString.split("</TD><TD>")[2];;
 							newAkkEventName = Html.fromHtml(newAkkEventName).toString();
