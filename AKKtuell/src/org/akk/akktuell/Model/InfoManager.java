@@ -14,7 +14,7 @@ import org.akk.akktuell.Model.downloader.EventDownloader;
 import org.akk.akktuell.database.*;
 
 
-public class InfoManager implements Runnable, EventDownloadListener {
+public class InfoManager implements EventDownloadListener {
 	
 	private boolean isOnline;
 
@@ -24,19 +24,16 @@ public class InfoManager implements Runnable, EventDownloadListener {
 	
 	private Context applicationContext;
 	
-	private Thread databaseManager;
-	
 	private EventDownloader parser;
 	
 	private Database database;
 	
-	private LinkedList<AkkEvent> eventsSortedByDate;
+	private AkkEvent[] eventsSortedByDate;
 	
 	private int currentMonth = new GregorianCalendar().get(GregorianCalendar.MONTH);
 	
 	public InfoManager(Context context) {
 		applicationContext = context;
-		eventsSortedByDate = new LinkedList<AkkEvent>();
 		database = Database.getInstance(context);
 		try {
 			database.open();
@@ -45,8 +42,8 @@ public class InfoManager implements Runnable, EventDownloadListener {
 			e.printStackTrace();
 		}
 		calendar = new CalendarBridge();
-		databaseManager = new Thread(this);
-		databaseManager.start();
+		
+		eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
 		
 		//check online state
 		this.isOnline = false;
@@ -80,7 +77,7 @@ public class InfoManager implements Runnable, EventDownloadListener {
 
 
 	public boolean readyToDisplayData() {
-		return !this.eventsSortedByDate.isEmpty();
+		return (!(this.eventsSortedByDate == null) && !(this.eventsSortedByDate.length == 0));
 	}
 	
 	public boolean isInCalendar(AkkEvent event) {
@@ -121,47 +118,30 @@ public class InfoManager implements Runnable, EventDownloadListener {
 
 	@Override
 	public void downloadFinished(AkkEvent[] events) {
+		AkkEvent currentEvent;
+		boolean wasInList;
 		synchronized (this) {
-			for (AkkEvent e : events) {
-				if (!eventsSortedByDate.contains(e)) {
-					eventsSortedByDate.addLast(e);
-					try {
-						database.insertAkkEvent(eventsSortedByDate.getLast());
-					} catch (DBException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+			for (int i = 0; i < events.length; i++) {
+				currentEvent = events[i];
+				wasInList = false;
+				for (int j = 0; j < eventsSortedByDate.length; j++) {
+					if (currentEvent.equals(eventsSortedByDate[j])) {
+						wasInList = true;
+						break;
 					}
 				}
-				
-			}
-		}
-		
-	}
-
-	@Override
-	public void run() {
-		AkkEvent[] events = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.DESCENDING);
-		downloadFinished(events);
-		
-		while (true)
-		{
-			synchronized (this) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (!wasInList) {
+					try {
+						database.insertAkkEvent(currentEvent);
+						eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
+					} catch (DBException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
-			
-			try {
-				database.insertAkkEvent(eventsSortedByDate.getLast());
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
 		}
+		
 	}
 	
 	public void finish() {
