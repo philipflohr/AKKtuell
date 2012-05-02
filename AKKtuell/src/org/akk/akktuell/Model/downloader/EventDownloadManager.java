@@ -8,7 +8,7 @@ import org.akk.akktuell.Model.InfoManager;
 import android.content.Context;
 import android.util.Log;
 
-public class EventDownloadManager implements EventDownloader {
+public class EventDownloadManager implements EventDownloader, Runnable {
 	
 	private ArrayList<EventDownloader> downloader = new ArrayList<EventDownloader>();
 	private static EventDownloadManager instance = null;
@@ -20,6 +20,8 @@ public class EventDownloadManager implements EventDownloader {
 
 	private EventDownloadManager(Context ctx) {
 		//TODO settings file, initialization of downloaders...
+		//TODO testing
+		downloader.add(new AkkHomepageEventParser(ctx));
 		
 	}
 
@@ -91,7 +93,16 @@ public class EventDownloadManager implements EventDownloader {
 
 	@Override
 	public void addEventDownloadListener(InfoManager infoManager) {
-		// TODO Auto-generated method stub
+		//testing
+		for (EventDownloader ed : downloader) {
+			ed.addEventDownloadListener(infoManager);
+		}
 		
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		downloader.get(0).updateEvents();
 	}
 }

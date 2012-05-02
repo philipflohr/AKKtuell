@@ -10,6 +10,7 @@ import android.util.Log;
 import org.akk.akktuell.Activity.AKKtuellEventView;
 import org.akk.akktuell.Model.downloader.AkkHomepageEventParser;
 import org.akk.akktuell.Model.downloader.EventDownloadListener;
+import org.akk.akktuell.Model.downloader.EventDownloadManager;
 import org.akk.akktuell.Model.downloader.EventDownloader;
 import org.akk.akktuell.database.*;
 
@@ -61,9 +62,11 @@ public class InfoManager implements EventDownloadListener {
 		}
 		//finished checking
 		
-		parser = new AkkHomepageEventParser(context);
-		parser.addEventDownloadListener(this);
-		parser.updateEvents();
+		if (this.isOnline) {
+			EventDownloadManager updateManager = EventDownloadManager.getInstance(context);
+			Thread updateManagerThread = new Thread(updateManager);
+			updateManagerThread.start();
+		}
 	}
 	
 //	private void updateEvents() {
