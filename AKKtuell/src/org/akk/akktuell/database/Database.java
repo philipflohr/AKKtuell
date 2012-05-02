@@ -3,6 +3,7 @@ package org.akk.akktuell.database;
 import java.util.GregorianCalendar;
 
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 
 import android.content.Context;
 import android.net.Uri;
@@ -68,7 +69,7 @@ public class Database implements DBInterface {
 
 	@Override
 	public boolean insertEvent(String eventName, String eventDescription,
-			String eventType, GregorianCalendar eventBeginTime, Uri eventPictureUri)
+			AkkEventType eventType, GregorianCalendar eventBeginTime, Uri eventPictureUri)
 			throws DBException {
 		return dbImplementation.insertEvent(eventName, eventDescription, eventType,
 				eventBeginTime, eventPictureUri);

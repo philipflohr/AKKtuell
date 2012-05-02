@@ -144,7 +144,7 @@ class SQLiteImpl implements DBInterface {
 									cursor.getString(cursor.getColumnIndex("date"))),
 							Uri.parse(cursor.getString(cursor.getColumnIndex("uri")))
 						);
-			events[i].setType(AkkEventType.valueOf(cursor.getString(cursor.getColumnIndex("type"))));
+			events[i].setType(AkkEventType.getAkkEventType(cursor.getString(cursor.getColumnIndex("type"))));
 		}
 		cursor.close();
 		return events;
@@ -199,7 +199,7 @@ class SQLiteImpl implements DBInterface {
 			throw new IllegalArgumentException("The given event must not be null.");
 		}
 		return this.insertEvent(event.getEventName(), event.getEventDescription(),
-				event.getEventType().name(),
+				event.getEventType(),
 				event.getEventBeginTime(), event.getEventPicUri(), timestamp);
 	}
 
@@ -245,7 +245,7 @@ class SQLiteImpl implements DBInterface {
 	 * @return true, if successful.
 	 * @throws DBException in case the event could not be inserted.
 	 */
-	private boolean insertEvent(String eventName, String eventDescription, String eventType,
+	private boolean insertEvent(String eventName, String eventDescription, AkkEventType eventType,
 			GregorianCalendar eventBeginTime, Uri eventPictureUri, long timestamp) throws DBException {
 		if (eventName == null
 				|| eventDescription == null
@@ -263,7 +263,7 @@ class SQLiteImpl implements DBInterface {
     	ContentValues values 	= new ContentValues();
     	values.put("name", eventName);
     	values.put("description", eventDescription);
-    	values.put("type", eventType);
+    	values.put("type", eventType.toString());
     	values.put("date", dateToIso8601(eventBeginTime));
     	values.put("uri", (eventPictureUri != null) ? eventPictureUri.toString() : "");
     	values.put("hash", hash);
@@ -280,7 +280,7 @@ class SQLiteImpl implements DBInterface {
 	}
 
 	@Override
-	public boolean insertEvent(String eventName, String eventDescription, String eventType,
+	public boolean insertEvent(String eventName, String eventDescription, AkkEventType eventType,
 			GregorianCalendar eventBeginTime, Uri eventPictureUri) throws DBException {
 		return insertEvent(eventName, eventDescription, eventType, eventBeginTime, eventPictureUri,
 				System.currentTimeMillis());

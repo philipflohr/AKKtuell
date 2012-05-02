@@ -1,6 +1,7 @@
 package org.akk.akktuell.database;
 
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 
 import java.util.GregorianCalendar;
 
@@ -76,7 +77,7 @@ public interface DBInterface {
 	 * @throws DBException in case the event could not be inserted.
 	 */
 	public boolean insertEvent(String eventName, String eventDescription,
-			String eventType, GregorianCalendar eventBeginTime,
+			AkkEventType eventType, GregorianCalendar eventBeginTime,
 			Uri eventPictureUri) throws DBException;
 
 	/**
