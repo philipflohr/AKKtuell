@@ -7,7 +7,39 @@ import android.net.Uri;
 public class AkkEvent {
 	
 	public enum AkkEventType {
-		Schlonz, Workshop, Tanzen, Sonderveranstaltung, Veranstaltungshinweis
+		Schlonz("Schlonz"),
+		Workshop("Workshop"),
+		Tanzen("Tanzen"),
+		Sonderveranstaltung("Sonderveranstaltung"),
+		Veranstaltungshinweis("Veranstaltungshinweis"),
+		Default("Schlonz");
+		
+		private final String desc;
+		
+		AkkEventType(String desc) {
+			this.desc = desc;
+		}
+
+		public boolean isEqual(Object o) {
+			if (o instanceof AkkEventType) {
+				return (this.equals(o));
+			} else if (o instanceof String) {
+				return (this.toString().equals((String) o));
+			}
+			return false;
+		}
+
+		public static AkkEventType getAkkEventType(String desc) {
+			for (AkkEventType t : AkkEventType.values())
+				if (t.isEqual(desc))
+					return t;
+			return Default;
+		}
+
+		public String toString() {
+			return this.desc;
+		}
+		
 	}
 
 	private final String eventName;
