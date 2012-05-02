@@ -68,12 +68,17 @@ public class Database implements DBInterface {
 
 	@Override
 	public boolean insertEvent(String eventName, String eventDescription,
-			GregorianCalendar eventBeginTime, Uri eventPictureUri)
+			String eventType, GregorianCalendar eventBeginTime, Uri eventPictureUri)
 			throws DBException {
-		return dbImplementation.insertEvent(eventName, eventDescription,
+		return dbImplementation.insertEvent(eventName, eventDescription, eventType,
 				eventBeginTime, eventPictureUri);
 	}
 
+	@Override
+	public boolean updateAkkEventsAndFlush(AkkEvent[] events) throws DBException {
+		return dbImplementation.updateAkkEventsAndFlush(events);
+	}
+	
 	@Override
 	public int deleteAkkEvent(AkkEvent event) {
 		return dbImplementation.deleteAkkEvent(event);
@@ -87,6 +92,11 @@ public class Database implements DBInterface {
 	@Override
 	public int deleteAllEventsBefore(GregorianCalendar date) {
 		return dbImplementation.deleteAllEventsBefore(date);
+	}
+
+	@Override
+	public int deleteAllEventsInsertedBefore(long timestamp) {
+		return dbImplementation.deleteAllEventsInsertedBefore(timestamp);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -143,6 +144,7 @@ class SQLiteImpl implements DBInterface {
 									cursor.getString(cursor.getColumnIndex("date"))),
 							Uri.parse(cursor.getString(cursor.getColumnIndex("uri")))
 						);
+			events[i].setType(AkkEventType.valueOf(cursor.getString(cursor.getColumnIndex("type"))));
 		}
 		cursor.close();
 		return events;
@@ -174,6 +176,7 @@ class SQLiteImpl implements DBInterface {
 		Log.w("AKKtuell - debug", q + "; " + debug);
 		return db.rawQuery(q, searchCriteria);
 	}
+
 	
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -183,33 +186,70 @@ class SQLiteImpl implements DBInterface {
 	
 
 	
-	@Override
-	public boolean insertAkkEvent(AkkEvent event) throws DBException {
+	/**
+	 * Works as {@link DBInterface#insertAkkEvent(AkkEvent)} does but also adds the current
+	 * timestamp.
+	 * @param event the event to insert.
+	 * @param timestamp the current timestamp.
+	 * @return true, if successful.
+	 * @throws DBException in case the event could not be inserted.
+	 */
+	private boolean insertAkkEvent(AkkEvent event, long timestamp) throws DBException {
 		if (event == null) {
 			throw new IllegalArgumentException("The given event must not be null.");
 		}
 		return this.insertEvent(event.getEventName(), event.getEventDescription(),
-				event.getEventBeginTime(), event.getEventPicUri());
+				event.getEventType().name(),
+				event.getEventBeginTime(), event.getEventPicUri(), timestamp);
 	}
-	
+
 	@Override
-	public boolean insertAkkEvents(AkkEvent[] events) throws DBException {
+	public boolean insertAkkEvent(AkkEvent event) throws DBException {
+		return insertAkkEvent(event, System.currentTimeMillis());
+	}
+
+
+	/**
+	 * Works as {@link DBInterface#insertAkkEvents(AkkEvent[])} does but also adds the
+	 * current timestamp.
+	 * @param event the event to insert.
+	 * @param timestamp the current timestamp.
+	 * @return true, if successful.
+	 * @throws DBException in case the event could not be inserted.
+	 */
+	private boolean insertAkkEvents(AkkEvent[] events, long timestamp) throws DBException {
 		if (events == null) {
 			throw new IllegalArgumentException("events must not be null.");
 		}
 		boolean returnValue = true;
 		for (int i = 0; i < events.length && returnValue; i++ ) {
-			returnValue = this.insertAkkEvent(events[i]);
+			returnValue = this.insertAkkEvent(events[i], timestamp);
 		}
 		return returnValue;
 	}
 
 	@Override
-	public boolean insertEvent(String eventName, String eventDescription,
-			GregorianCalendar eventBeginTime, Uri eventPictureUri) throws DBException {
+	public boolean insertAkkEvents(AkkEvent[] events) throws DBException {
+		long timestamp = System.currentTimeMillis();
+		return insertAkkEvents(events, timestamp);
+	}
+
+	/**
+	 * Works as {@link DBInterface#insertEvent(String, String, GregorianCalendar, Uri)}
+	 * does but additionally it accepts a given timestamp.
+	 * @param eventName the name of the event.
+	 * @param eventDescription the description of the event.
+	 * @param eventBeginTime the starting date of the event.
+	 * @param eventPictureUri the uri to the event.
+	 * @param timestamp the timestamp of the insertion.
+	 * @return true, if successful.
+	 * @throws DBException in case the event could not be inserted.
+	 */
+	private boolean insertEvent(String eventName, String eventDescription, String eventType,
+			GregorianCalendar eventBeginTime, Uri eventPictureUri, long timestamp) throws DBException {
 		if (eventName == null
 				|| eventDescription == null
-				//TODO || eventType == null
+				|| eventType == null //TODO needed?
 				|| eventBeginTime == null
 				) {
 			throw new IllegalArgumentException("The given event " +
@@ -217,17 +257,21 @@ class SQLiteImpl implements DBInterface {
 		}
 
 		long rowid = -1;
+		int hash = new String(eventName + eventDescription + eventBeginTime).hashCode();
 		
     	//Set new line if not existent
     	ContentValues values 	= new ContentValues();
     	values.put("name", eventName);
     	values.put("description", eventDescription);
-    	//TODO values.put("type", eventName);
+    	values.put("type", eventType);
     	values.put("date", dateToIso8601(eventBeginTime));
     	values.put("uri", (eventPictureUri != null) ? eventPictureUri.toString() : "");
+    	values.put("hash", hash);
+    	values.put("timestamp", timestamp);
 
     	try {
-    		rowid = db.insertOrThrow(TABLE, null, values);
+    		rowid = db.insertWithOnConflict(TABLE, null, values,
+    				SQLiteDatabase.CONFLICT_REPLACE);
     	} catch (SQLException e) {
     		throw new DBException(e, "Could not insert the new event into the database.");
     	}
@@ -235,6 +279,23 @@ class SQLiteImpl implements DBInterface {
 		return (rowid >= 0);
 	}
 
+	@Override
+	public boolean insertEvent(String eventName, String eventDescription, String eventType,
+			GregorianCalendar eventBeginTime, Uri eventPictureUri) throws DBException {
+		return insertEvent(eventName, eventDescription, eventType, eventBeginTime, eventPictureUri,
+				System.currentTimeMillis());
+	}
+
+	@Override
+	public boolean updateAkkEventsAndFlush(AkkEvent[] events) throws DBException {
+		long timestamp = System.currentTimeMillis();
+		boolean returnValue = insertAkkEvents(events, timestamp);
+		if (returnValue) {
+			deleteAllEventsInsertedBefore(timestamp);
+		}
+		return returnValue;
+	}
+	
 	@Override
 	public int deleteAkkEvent(AkkEvent event) {
 		if (event == null) {
@@ -263,6 +324,16 @@ class SQLiteImpl implements DBInterface {
 		return db.delete(TABLE,
 				"date < ?",
 				new String[]{dateToIso8601(date)}
+				);
+	}
+
+	@Override
+	public int deleteAllEventsInsertedBefore(long timestamp) {
+		if (timestamp > 0)
+			throw new IllegalArgumentException("The timestamp may not less or equal zero.");
+		return db.delete(TABLE,
+				"date < ?",
+				new String[]{timestamp + ""}
 				);
 	}
 
@@ -432,10 +503,12 @@ class SQLiteImpl implements DBInterface {
         		Log.w("AKKtuell", "Starting to create DB");
         		db.execSQL("create virtual table events using fts3("
         				+ "name " + SqlDataTypes.STRING + " not null, "
-        				+ "description " + SqlDataTypes.STRING + " not null, "
+        				+ "description " + SqlDataTypes.STRING + ", "
         				+ "type " + SqlDataTypes.STRING + " not null, "
         				+ "date " + SqlDataTypes.DATE + " not null, "
-        				+ "uri " + SqlDataTypes.STRING
+        				+ "uri " + SqlDataTypes.STRING + ", "
+        				+ "hash " + SqlDataTypes.INTEGER + " unique not null, " 
+        				+ "timestamp " + SqlDataTypes.INTEGER + " not null"
         				+ "); "
         			);
         		Log.w("AKKtuell", "finished creating DB");
