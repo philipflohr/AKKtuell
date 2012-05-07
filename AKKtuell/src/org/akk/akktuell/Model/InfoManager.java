@@ -1,5 +1,6 @@
 package org.akk.akktuell.Model;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import android.content.Context;
@@ -31,7 +32,7 @@ public class InfoManager implements EventDownloadListener {
 	
 	private Database database;
 	
-	private AkkEvent[] eventsSortedByDate = null;
+	private AkkEvent[][] eventsPerMonthSortedByDate = new AkkEvent[12][];
 	
 	private int currentMonth = new GregorianCalendar().get(GregorianCalendar.MONTH);
 	
@@ -41,21 +42,17 @@ public class InfoManager implements EventDownloadListener {
 	
 	private Handler viewUpdateHandler;
 	
-	public InfoManager(Context context, Handler viewUpdateHandler) {
+	public InfoManager(Context context, Handler viewUpdateHandler) throws DBException {
 		this.viewUpdateHandler = viewUpdateHandler;
 		applicationContext = context;
 		database = Database.getInstance(context);
 
-		try {
-			database.open();
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		database.open();
+		updateEventLists();
 		calendar = new CalendarBridge();
 
 		//load initial list from db
-		eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
+		
 		if (readyToDisplayData()) {
 			this.viewUpdateHandler.sendEmptyMessage(0);
 		}
@@ -79,6 +76,13 @@ public class InfoManager implements EventDownloadListener {
 		}
 	}
 	
+	private void updateEventLists() {
+		for (int i = 0; i < 12; i++) {
+			eventsPerMonthSortedByDate[i] = database.getAllEventsInMonth(i, currentYear, DBFields.EVENT_DATE, DBInterface.ASCENDING); 
+		}
+		
+	}
+
 //	private void updateEvents() {
 //		if (this.isOnline) {
 //			if (updater.updateNeeded()) {
@@ -94,7 +98,7 @@ public class InfoManager implements EventDownloadListener {
 
 
 	public boolean readyToDisplayData() {
-		return (!(this.eventsSortedByDate == null) && !(this.eventsSortedByDate.length == 0));
+		return (!(this.eventsPerMonthSortedByDate[currentMonth] == null) && !(this.eventsPerMonthSortedByDate[currentMonth].length == 0));
 	}
 	
 	public boolean isInCalendar(AkkEvent event) {
@@ -106,27 +110,18 @@ public class InfoManager implements EventDownloadListener {
 	}
 
 	public AkkEvent[] getEvents() {
-		//next line is wiered... its null if you dont do that...
-		this.eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
-		LinkedList<AkkEvent> resultList = new LinkedList<AkkEvent>();
-		for (AkkEvent event : eventsSortedByDate) {
-			if (event.getEventBeginTime().get(GregorianCalendar.MONTH) == currentMonth) {
-				resultList.add(event);
-			}
+		if (eventsPerMonthSortedByDate[currentMonth] == null || eventsPerMonthSortedByDate[currentMonth].length == 0) {
+			AkkEvent[] result = new AkkEvent[1];
+			result[0] = new AkkEvent("Sorry - No events in this month", new GregorianCalendar(), "Nowhere");
+			return result;
+		} else {
+			return eventsPerMonthSortedByDate[currentMonth];
 		}
-		AkkEvent result[] = new AkkEvent[resultList.size()];
-		for (int i = 0; i < resultList.size(); i++) {
-			result[i] = resultList.get(i);
-		}
-		this.eventsSortedByDate = database.getAllEventsInMonth(currentMonth, 
-				currentYear, DBFields.EVENT_DATE, DBInterface.DESCENDING);
-		return result;
 	}
 	
 	public boolean setCurrentMonth(int month) {
 		if (month >= 0 && month < 12) {
 			currentMonth = month;
-			this.eventsSortedByDate = null;
 			return true;
 		}
 		return false;
@@ -171,7 +166,7 @@ public class InfoManager implements EventDownloadListener {
 				//TODO Error message in gui
 				e.printStackTrace();
 			}
-			eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
+			updateEventLists();
 			viewUpdateHandler.sendEmptyMessage(0);
 		}
 	}

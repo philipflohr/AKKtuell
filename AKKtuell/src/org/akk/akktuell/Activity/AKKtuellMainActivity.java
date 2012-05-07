@@ -7,6 +7,7 @@ import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.akk.akktuell.Model.InfoManager;
+import org.akk.akktuell.database.DBException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -70,7 +71,13 @@ public class AKKtuellMainActivity extends Activity  {
 				return true;
 			}
 		});
-        infoManager = new InfoManager(getApplicationContext(), viewUpdateHandler);
+        try {
+			infoManager = new InfoManager(getApplicationContext(), viewUpdateHandler);
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.finish();
+		}
     }
     
     public void onDataAvailable() {
