@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import org.akk.akktuell.Activity.AKKtuellEventView;
+import org.akk.akktuell.Activity.AKKtuellMainActivity;
 import org.akk.akktuell.Model.downloader.AkkHomepageEventParser;
 import org.akk.akktuell.Model.downloader.EventDownloadListener;
 import org.akk.akktuell.Model.downloader.EventDownloadManager;
@@ -34,6 +35,10 @@ public class InfoManager implements EventDownloadListener {
 	private int currentMonth = new GregorianCalendar().get(GregorianCalendar.MONTH);
 	
 	private int currentYear = new GregorianCalendar().get(GregorianCalendar.YEAR);
+	
+	private Thread updateManagerThread;
+	
+	private AKKtuellMainActivity mainActivity;
 	
 	public InfoManager(Context context) {
 		applicationContext = context;
@@ -64,7 +69,7 @@ public class InfoManager implements EventDownloadListener {
 		
 		if (this.isOnline) {
 			EventDownloadManager updateManager = EventDownloadManager.getInstance(context);
-			Thread updateManagerThread = new Thread(updateManager);
+			updateManagerThread = new Thread(updateManager);
 			updateManagerThread.start();
 		}
 	}
@@ -159,10 +164,18 @@ public class InfoManager implements EventDownloadListener {
 				//TODO Error message in gui
 				e.printStackTrace();
 			}
+			eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
+			mainActivity.onDataAvailable();
 		}
 	}
 	
 	public void finish() {
 		database.close();
+	}
+
+	public void addOnDataAvailableListener(
+			AKKtuellMainActivity akKtuellMainActivity) {
+		mainActivity = akKtuellMainActivity;
+		
 	}
 }

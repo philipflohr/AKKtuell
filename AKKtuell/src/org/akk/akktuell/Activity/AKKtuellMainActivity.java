@@ -32,6 +32,7 @@ public class AKKtuellMainActivity extends Activity  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.waiting_for_data);
         monthCounter = 0;
         gestureScanner = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {			
 			@Override
@@ -51,15 +52,19 @@ public class AKKtuellMainActivity extends Activity  {
 					}
 				} else {
 					//this is not a guesture we want to interpret
+					return false;
 				}
 				
 				AKKtuellMainActivity.this.displayData();
-				return false;
+				return true;
 			}
 		});
         infoManager = new InfoManager(getApplicationContext());
-        
-        setContentView(R.layout.main);
+        infoManager.addOnDataAvailableListener(this);        
+    }
+    
+    public void onDataAvailable() {
+    	setContentView(R.layout.main);
         elementListView = (ListView) findViewById(R.id.main_element_listview);
         //elementListView.addHeaderView(view, null, false);
         elementListView.setOnItemClickListener(new OnItemClickListener() {  
@@ -77,13 +82,17 @@ public class AKKtuellMainActivity extends Activity  {
         		}
         });
         displayData();
-        
     }
     
     private void displayData() {
-    	while (!infoManager.readyToDisplayData()) {
+    	if (!infoManager.readyToDisplayData()) {
+    		setContentView(R.layout.waiting_for_data);
+    		while (!infoManager.readyToDisplayData()) {
     		//wait for data update
+    		}
+    		setContentView(R.layout.main);
     	}
+    	
 		View mainView = findViewById(R.id.main_activity_layout);
 		TextView listHeaderMonthName = (TextView) mainView.findViewById(R.id.main_activity_list_header);
 		listHeaderMonthName.setText(new DateFormatSymbols().getMonths()[new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter]);
