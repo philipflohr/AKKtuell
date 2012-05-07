@@ -5,15 +5,12 @@ import java.util.GregorianCalendar;
 
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
-import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.akk.akktuell.Model.InfoManager;
 import org.akk.akktuell.database.DBException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;

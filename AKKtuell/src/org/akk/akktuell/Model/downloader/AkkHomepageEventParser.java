@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
-import org.akk.akktuell.Model.InfoManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -389,11 +388,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		}
 	}
 
-	private boolean elementsWaitingForDBPush() {
-		synchronized (this) {
-			return !this.eventsWaitingForDBPush.isEmpty();
-		}
-	}
 
 	private boolean elementsWaitingForDesc() {
 		synchronized (this) {
@@ -422,15 +416,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		}
 	}
 	
-	private AkkEvent popElementFromDBPushList() {
-		AkkEvent event;
-		synchronized (this) {
-			event = this.eventsWaitingForDBPush.getFirst();
-			this.eventsWaitingForDBPush.removeFirst();
-		}
-		return event;
-	}
-
 	@Override
 	public boolean isUpdating() {
 		return this.updateRequested;

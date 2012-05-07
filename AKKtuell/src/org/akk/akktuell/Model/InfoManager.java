@@ -1,20 +1,13 @@
 package org.akk.akktuell.Model;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
-import android.util.Log;
 
-import org.akk.akktuell.Activity.AKKtuellEventView;
-import org.akk.akktuell.Activity.AKKtuellMainActivity;
-import org.akk.akktuell.Model.downloader.AkkHomepageEventParser;
 import org.akk.akktuell.Model.downloader.EventDownloadListener;
 import org.akk.akktuell.Model.downloader.EventDownloadManager;
-import org.akk.akktuell.Model.downloader.EventDownloader;
 import org.akk.akktuell.database.*;
 
 
@@ -25,10 +18,6 @@ public class InfoManager implements EventDownloadListener {
 	private CalendarBridge calendar;
 	
 	private ConnectivityManager conMgr;
-	
-	private Context applicationContext;
-	
-	private EventDownloader parser;
 	
 	private Database database;
 	
@@ -46,7 +35,6 @@ public class InfoManager implements EventDownloadListener {
 	
 	public InfoManager(Context context, Handler viewUpdateHandler) throws DBException {
 		this.viewHandler = viewUpdateHandler;
-		applicationContext = context;
 		database = Database.getInstance(context);
 
 		database.open();

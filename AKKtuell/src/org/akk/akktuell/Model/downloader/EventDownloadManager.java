@@ -74,19 +74,6 @@ public class EventDownloadManager implements EventDownloader, Runnable {
 		}
 	}
 
-	private class Downloader {
-		private final EventDownloader downloader;
-		private int lastUsed = -1;
-		private boolean wasOnline = false;
-
-		public Downloader(EventDownloader downloader) {
-			this.downloader = downloader;
-		}
-
-		
-		
-	}
-
 	@Override
 	public void setUrl(String url) {
 		// nothing to do?
