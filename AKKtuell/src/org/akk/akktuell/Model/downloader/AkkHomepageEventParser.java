@@ -241,7 +241,29 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 						newAkkEvent.setType(AkkEventType.Veranstaltungshinweis);
 						this.addElementToDBPushList(newAkkEvent);
 					}
-				}	
+				} else if (newAkkEventType == AkkEventType.Workshop) {
+					/*EXAMPLE STRINGS:
+					  	D/Example Strings(  978): Di. 8. Mai.</TD><TD>15<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Pr&uuml;fungsangst</A></TD><TD>
+						D/Example Strings(  978): Sa. 12. Mai.</TD><TD>11<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Photoworkshop f&uuml;r Anf&auml;nger</A></TD><TD>
+						D/Example Strings(  978): Sa. 12. Mai.</TD><TD>13<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Tango Argentino f&uuml;r Anf&auml;nger</A></TD><TD>
+						D/Example Strings(  978): Sa. 19. Mai.</TD><TD>11<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Massage - Ein sinnliches Erlebnis</A></TD><TD>
+						D/Example Strings(  978): Sa. 2. Jun.</TD><TD>10<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Salsa f&uuml;r Anf&auml;nger</A></TD><TD>
+						D/Example Strings(  978): Sa. 2. Jun.</TD><TD>11<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Massage - Ein sinnliches Erlebnis</A></TD><TD>
+						D/Example Strings(  978): Sa. 2. Jun.</TD><TD>13<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Tango Argentino f&uuml;r Fortgeschrittene</A></TD><TD>
+						D/Example Strings(  978): So. 3. Jun.</TD><TD>13<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: F&uuml;hrungsakademie</A></TD><TD>
+						D/Example Strings(  978): Mo. 4. Jun.</TD><TD>18<SPAN class="min-alt">:</SPAN><SPAN class="min">00</SPAN> Uhr</TD><TD><A HREF="/workshops/">Workshop: Linux kennenlernen</A></TD><TD>
+					 */
+					
+					//cut the last 12 charaters
+					currentEventString = currentEventString.substring(0, currentEventString.length() - 13);
+					String[] splittStrings = currentEventString.split("/\">");
+					newAkkEventName = splittStrings[splittStrings.length - 1];
+					newAkkEventName = Html.fromHtml(newAkkEventName).toString();
+					newAkkEventPlace = "This is s good question - but the website has no answer for this";
+					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
+					newAkkEvent.setType(newAkkEventType);
+					this.addElementToWaitingList(newAkkEvent);
+				}
 			}
 			allEventsParsed = true;
 			while(elementsWaitingForDesc() || getDescThreads.activeCount() > 0) {
@@ -366,25 +388,29 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 	private void addDescriptionToEvent(AkkEvent event) {
-		String eventSource = event.getEventDescription();
-		eventSource = eventSource.split("<A HREF=\"")[1];
-		String eventDescriptionSource = eventSource.split("\">")[0];
-		eventDescriptionSource = "http://www.akk.org" + eventDescriptionSource;
-		try {
-			eventDescriptionSource = getDescriptionSource(eventDescriptionSource);
-			String eventDescription = eventDescriptionSource.split("<P>")[1];
-			eventDescription = Html.fromHtml(eventDescription.split("</P>")[0]).toString();
-			event.setDescription(eventDescription);
-		} catch (IOException e) {
-			Log.d("HPParser", "Could not get event Description...");
-			e.printStackTrace();
-			event.setDescription("Error fetching Description");
-			return;
-		} catch (ArrayIndexOutOfBoundsException e) {
-			Log.d("HPParser", "Could not get event Description...");
-			e.printStackTrace();
-			event.setDescription("Error fetching Description");
-			return;
+		if (event.getEventType() == AkkEventType.Schlonz) {
+			String eventSource = event.getEventDescription();
+			eventSource = eventSource.split("<A HREF=\"")[1];
+			String eventDescriptionSource = eventSource.split("\">")[0];
+			eventDescriptionSource = "http://www.akk.org" + eventDescriptionSource;
+			try {
+				eventDescriptionSource = getDescriptionSource(eventDescriptionSource);
+				String eventDescription = eventDescriptionSource.split("<P>")[1];
+				eventDescription = Html.fromHtml(eventDescription.split("</P>")[0]).toString();
+				event.setDescription(eventDescription);
+			} catch (IOException e) {
+				Log.d("HPParser", "Could not get event Description...");
+				e.printStackTrace();
+				event.setDescription("Error fetching Description");
+				return;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				Log.d("HPParser", "Could not get event Description...");
+				e.printStackTrace();
+				event.setDescription("Error fetching Description");
+				return;
+			}
+		} else if (event.getEventType() == AkkEventType.Workshop) {
+			event.setDescription("This is not implemented yet");
 		}
 	}
 
