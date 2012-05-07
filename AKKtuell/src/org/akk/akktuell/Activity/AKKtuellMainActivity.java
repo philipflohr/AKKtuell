@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -153,6 +154,7 @@ public class AKKtuellMainActivity extends Activity  {
 	@Override
 	public void finish() {
 		infoManager.finish();
+		super.finish();
 	}
 	
 	@Override
@@ -178,4 +180,17 @@ public class AKKtuellMainActivity extends Activity  {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	
+	//end the application if back is pressed and no data is available
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+	    if ((keyCode == KeyEvent.KEYCODE_BACK) && !infoManager.readyToDisplayData())
+	    {
+	        finish();
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+
 }
