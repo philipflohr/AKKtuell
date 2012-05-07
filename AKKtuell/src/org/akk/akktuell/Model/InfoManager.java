@@ -154,6 +154,9 @@ public class InfoManager implements EventDownloadListener {
 	}
 
 	public boolean isOnline() {
+		if (!isOnline) {
+			recheckOnlineState();
+		}
 		return isOnline;
 	}
 
@@ -161,6 +164,17 @@ public class InfoManager implements EventDownloadListener {
 		if (!updateManagerThread.isAlive()) {
 			updateManagerThread = new Thread(updateManager);
 			updateManagerThread.start();
+		}
+	}
+	
+	private void recheckOnlineState() {
+		isOnline = false;
+		NetworkInfo[] netInfo = conMgr.getAllNetworkInfo();
+		for (NetworkInfo netInf: netInfo) {
+			if (netInf.isConnected()) {
+				this.isOnline = true;
+				break;
+			}
 		}
 	}
 }

@@ -186,7 +186,7 @@ public class AKKtuellMainActivity extends Activity  {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
-	    if ((keyCode == KeyEvent.KEYCODE_BACK) && !infoManager.readyToDisplayData())
+	    if ((keyCode == KeyEvent.KEYCODE_BACK) && !infoManager.readyToDisplayData() && !infoManager.isOnline())
 	    {
 	        finish();
 	    }
