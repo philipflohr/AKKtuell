@@ -371,7 +371,7 @@ class SQLiteImpl implements DBInterface {
 	@Override
 	public AkkEvent[] getAllEventsInMonth(int month, int year, DBFields orderBy,
 			int direction) {
-		if ((month >= 1) && (month <= 12)) {
+		if ((month >= 0) && (month < 12)) {
 			int y = year;
 			if ((year < 0) || (year > 9999)) {
 				y = Calendar.getInstance().get(Calendar.YEAR);

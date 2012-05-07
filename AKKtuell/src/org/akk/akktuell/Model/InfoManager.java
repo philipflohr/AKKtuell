@@ -40,10 +40,12 @@ public class InfoManager implements EventDownloadListener {
 	
 	private Thread updateManagerThread;
 	
-	private Handler viewUpdateHandler;
+	private Handler viewHandler;
+	
+	private EventDownloadManager updateManager;
 	
 	public InfoManager(Context context, Handler viewUpdateHandler) throws DBException {
-		this.viewUpdateHandler = viewUpdateHandler;
+		this.viewHandler = viewUpdateHandler;
 		applicationContext = context;
 		database = Database.getInstance(context);
 
@@ -54,7 +56,7 @@ public class InfoManager implements EventDownloadListener {
 		//load initial list from db
 		
 		if (readyToDisplayData()) {
-			this.viewUpdateHandler.sendEmptyMessage(0);
+			this.viewHandler.sendEmptyMessage(0);
 		}
 
 		//check online state
@@ -69,10 +71,17 @@ public class InfoManager implements EventDownloadListener {
 		}
 		//finished checking
 		
+		updateManager = EventDownloadManager.getInstance(context, this);
+		updateManagerThread = new Thread(updateManager);
 		if (this.isOnline) {
-			EventDownloadManager updateManager = EventDownloadManager.getInstance(context, this);
-			updateManagerThread = new Thread(updateManager);
 			updateManagerThread.start();
+		} else {
+			if (this.readyToDisplayData()) {
+				//There is something to display... 
+				viewHandler.sendEmptyMessage(1);
+			} else {
+				viewHandler.sendEmptyMessage(2);
+			}
 		}
 	}
 	
@@ -82,20 +91,6 @@ public class InfoManager implements EventDownloadListener {
 		}
 		
 	}
-
-//	private void updateEvents() {
-//		if (this.isOnline) {
-//			if (updater.updateNeeded()) {
-//				t = new Thread(updater);
-//				t.run();
-//			} else {
-//				Log.d("InfoManager", "No updated required");
-//			}
-//		} else {
-//			Log.d("Updater", "Unable to update: no internet connection");
-//		}
-//	}
-
 
 	public boolean readyToDisplayData() {
 		return (!(this.eventsPerMonthSortedByDate[currentMonth] == null) && !(this.eventsPerMonthSortedByDate[currentMonth].length == 0));
@@ -119,6 +114,8 @@ public class InfoManager implements EventDownloadListener {
 		}
 	}
 	
+	
+	
 	public boolean setCurrentMonth(int month) {
 		if (month >= 0 && month < 12) {
 			currentMonth = month;
@@ -136,30 +133,7 @@ public class InfoManager implements EventDownloadListener {
 	
 	@Override
 	public void downloadFinished(AkkEvent[] events) {
-		AkkEvent currentEvent;
-		boolean wasInList;
-		synchronized (this) {
-//			for (int i = 0; i < events.length; i++) {
-//				currentEvent = events[i];
-//				wasInList = false;
-//				for (int j = 0; j < eventsSortedByDate.length; j++) {
-//					if (currentEvent.equals(eventsSortedByDate[j])) {
-//						wasInList = true;
-//						break;
-//					}
-//				}
-//				if (!wasInList) {
-//					try {
-//						database.insertAkkEvent(currentEvent);
-//						eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
-//					} catch (DBException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		}
-//			
+		synchronized (this) {		
 			try {
 				database.insertAkkEvents(events);
 			} catch (DBException e) {
@@ -167,7 +141,7 @@ public class InfoManager implements EventDownloadListener {
 				e.printStackTrace();
 			}
 			updateEventLists();
-			viewUpdateHandler.sendEmptyMessage(0);
+			viewHandler.sendEmptyMessage(0);
 		}
 	}
 	
@@ -176,6 +150,17 @@ public class InfoManager implements EventDownloadListener {
 	}
 	
 	public void setViewUpdateHandler(Handler updateHandler) {
-		this.viewUpdateHandler = updateHandler;
+		this.viewHandler = updateHandler;
+	}
+
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	public void updateEvents() {
+		if (!updateManagerThread.isAlive()) {
+			updateManagerThread = new Thread(updateManager);
+			updateManagerThread.start();
+		}
 	}
 }
