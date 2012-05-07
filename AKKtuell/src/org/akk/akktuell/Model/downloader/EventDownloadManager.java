@@ -56,6 +56,7 @@ public class EventDownloadManager implements EventDownloader, Runnable {
 
 			if (this.currentDownloader.updateEvents() != null) {
 				this.unsuccessfullDownloadAttempts = 0;
+				this.currentDownloader = null;
 				return null;
 			} else {
 				unsuccessfullDownloadAttempts++;

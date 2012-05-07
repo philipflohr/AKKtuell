@@ -83,6 +83,10 @@ public class AKKtuellMainActivity extends Activity  {
     				//There is no data to display and it's not possible to download something.
     				Toast toast = Toast.makeText(getApplicationContext(), "There is no local data and you are not connected to the internet.\nSo this app is currently useless", 1500);
 	        		toast.show();
+    			} else if (msg.what == 3) {
+    				//There is no data to display and it's not possible to download something.
+    				Toast toast = Toast.makeText(getApplicationContext(), "There is already an update in process", 1500);
+	        		toast.show();
     			}
     		}
     	};

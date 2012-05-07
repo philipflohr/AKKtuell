@@ -152,6 +152,10 @@ public class InfoManager implements EventDownloadListener {
 		if (!updateManagerThread.isAlive()) {
 			updateManagerThread = new Thread(updateManager);
 			updateManagerThread.start();
+		} else {
+			if (updateManager.isUpdating()) {
+				viewHandler.sendEmptyMessage(3);
+			}
 		}
 	}
 	
