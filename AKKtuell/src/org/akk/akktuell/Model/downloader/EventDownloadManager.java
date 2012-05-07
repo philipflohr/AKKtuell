@@ -18,16 +18,18 @@ public class EventDownloadManager implements EventDownloader, Runnable {
 	private EventDownloader currentDownloader = null;
 	
 
-	private EventDownloadManager(Context ctx) {
+	private EventDownloadManager(Context ctx, InfoManager infoManager) {
 		//TODO settings file, initialization of downloaders...
 		//TODO testing
-		downloader.add(new AkkHomepageEventParser(ctx));
+		AkkHomepageEventParser parser = new AkkHomepageEventParser(ctx);
+		parser.addEventDownloadListener(infoManager);
+		downloader.add(parser);
 		
 	}
 
-	public static EventDownloadManager getInstance(Context ctx) {
+	public static EventDownloadManager getInstance(Context ctx, InfoManager infomanager) {
 		if (instance == null) {
-			instance = new EventDownloadManager(ctx);
+			instance = new EventDownloadManager(ctx, infomanager);
 		}
 		return instance;
 	}
@@ -92,7 +94,7 @@ public class EventDownloadManager implements EventDownloader, Runnable {
 	}
 
 	@Override
-	public void addEventDownloadListener(InfoManager infoManager) {
+	public void addEventDownloadListener(EventDownloadListener infoManager) {
 		//testing
 		for (EventDownloader ed : downloader) {
 			ed.addEventDownloadListener(infoManager);

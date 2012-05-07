@@ -2,6 +2,7 @@ package org.akk.akktuell.Activity;
 
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
+import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.akk.akktuell.Model.InfoManager;
 
 import android.content.Context;
@@ -40,5 +41,10 @@ public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 			eventInCalendar.setChecked(false);
 		}
 		return listItemView;
+	}
+	
+	@Override
+	public boolean isEnabled(int location) {
+		return (location >= 0 && location < events.length) ? (events[location - 1].getEventType().equals(AkkEventType.Schlonz)) : false;
 	}
 }

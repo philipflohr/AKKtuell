@@ -33,5 +33,5 @@ public interface EventDownloader {
 	 */
 	public void setUrl(String url);
 
-	public void addEventDownloadListener(InfoManager infoManager);
+	public void addEventDownloadListener(EventDownloadListener listener);
 }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.util.Log;
 
 import org.akk.akktuell.Activity.AKKtuellEventView;
@@ -38,9 +39,10 @@ public class InfoManager implements EventDownloadListener {
 	
 	private Thread updateManagerThread;
 	
-	private AKKtuellMainActivity mainActivity;
+	private Handler viewUpdateHandler;
 	
-	public InfoManager(Context context) {
+	public InfoManager(Context context, Handler viewUpdateHandler) {
+		this.viewUpdateHandler = viewUpdateHandler;
 		applicationContext = context;
 		database = Database.getInstance(context);
 
@@ -54,6 +56,9 @@ public class InfoManager implements EventDownloadListener {
 
 		//load initial list from db
 		eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
+		if (readyToDisplayData()) {
+			this.viewUpdateHandler.sendEmptyMessage(0);
+		}
 
 		//check online state
 		this.isOnline = false;
@@ -68,7 +73,7 @@ public class InfoManager implements EventDownloadListener {
 		//finished checking
 		
 		if (this.isOnline) {
-			EventDownloadManager updateManager = EventDownloadManager.getInstance(context);
+			EventDownloadManager updateManager = EventDownloadManager.getInstance(context, this);
 			updateManagerThread = new Thread(updateManager);
 			updateManagerThread.start();
 		}
@@ -101,6 +106,8 @@ public class InfoManager implements EventDownloadListener {
 	}
 
 	public AkkEvent[] getEvents() {
+		//next line is wiered... its null if you dont do that...
+		this.eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
 		LinkedList<AkkEvent> resultList = new LinkedList<AkkEvent>();
 		for (AkkEvent event : eventsSortedByDate) {
 			if (event.getEventBeginTime().get(GregorianCalendar.MONTH) == currentMonth) {
@@ -165,17 +172,15 @@ public class InfoManager implements EventDownloadListener {
 				e.printStackTrace();
 			}
 			eventsSortedByDate = database.getAllEvents(DBFields.EVENT_DATE, DBInterface.ASCENDING);
-			mainActivity.onDataAvailable();
+			viewUpdateHandler.sendEmptyMessage(0);
 		}
 	}
 	
 	public void finish() {
 		database.close();
 	}
-
-	public void addOnDataAvailableListener(
-			AKKtuellMainActivity akKtuellMainActivity) {
-		mainActivity = akKtuellMainActivity;
-		
+	
+	public void setViewUpdateHandler(Handler updateHandler) {
+		this.viewUpdateHandler = updateHandler;
 	}
 }

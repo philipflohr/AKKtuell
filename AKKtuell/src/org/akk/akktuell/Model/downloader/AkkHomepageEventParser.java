@@ -442,8 +442,9 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 
-	public void addEventDownloadListener(InfoManager infoManager) {
-		listeners.add(infoManager);
+	@Override
+	public void addEventDownloadListener(EventDownloadListener infoManager) {
+		listeners.add(infoManager);		
 	}
 
 }
