@@ -185,9 +185,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 							newAkkEvent.setDescription(currentEventString);
 							newAkkEvent.setType(AkkEventType.Schlonz);
 							this.addElementToWaitingList(newAkkEvent);
-							synchronized (this) {
-								notify();
-							}
 						} else {
 							String source = currentEventString.split("</SPAN>")[2];
 							newAkkEventName = source.split("</TD><TD>")[1];
@@ -279,6 +276,10 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 						this.addElementToWaitingList(newAkkEvent);
 					}
 				}
+			}
+			
+			synchronized (this) {
+				notify();
 			}
 			allEventsParsed = true;
 			while(elementsWaitingForDesc() || getDescThreads.activeCount() > 0) {
@@ -385,7 +386,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				if (!allEventsParsed) {
 					synchronized (this) {
 						try {
-							wait();
+							wait(500);
 						} catch (InterruptedException e) {
 							Log.d("AkkHomepageParse", "Thread got InterrupterException.");
 						} 
@@ -433,11 +434,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				e.printStackTrace();
 				event.setDescription("Error fetching Description");
 				return;
-			} /*catch (ArrayIndexOutOfBoundsException e) {
-				Log.d("HPParser", "Could not get event Description...");
-				e.printStackTrace();
-				event.setDescription("Error fetching Description");
-			}*/
+			} 
 		} else if (event.getEventType() == AkkEventType.Workshop) {
 			String descSource = null;
 			try {

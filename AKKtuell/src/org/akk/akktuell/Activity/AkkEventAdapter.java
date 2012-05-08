@@ -10,17 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 	private final Context context;
 	private final AkkEvent[] events;
-	private final InfoManager infoManager;
 
 	public AkkEventAdapter(Context context, AkkEvent[] events, InfoManager infoManager) {
 		super(context, R.layout.main_activity_list_item, events);
-		this.infoManager = infoManager;
 		this.context = context;
 		this.events = events;
 	}
