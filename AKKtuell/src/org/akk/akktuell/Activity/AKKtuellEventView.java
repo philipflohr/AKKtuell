@@ -13,12 +13,22 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * The Class AKKtuellEventView. It displays the information given to it via an intent
+ * 
+ * @author Philip Flohr
+ */
 public class AKKtuellEventView extends Activity {
 
+	/** The tools. */
 	private Tools tools;
 	
+	/** The is in calendar. */
 	private boolean isInCalendar;
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,6 +36,9 @@ public class AKKtuellEventView extends Activity {
 		setupView();
 	}
 
+	/**
+	 * Setup view.
+	 */
 	private void setupView() {
 		if (tools.isInLandscapeMode()) {
 			setContentView(R.layout.simple_event_view_landscape);
@@ -46,6 +59,9 @@ public class AKKtuellEventView extends Activity {
 		// eventImage.setImageURI(eventPicUri);
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onConfigurationChanged(android.content.res.Configuration)
+	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		//To speed up the app, the activity is not restarted on screen rotation
@@ -57,6 +73,9 @@ public class AKKtuellEventView extends Activity {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (!this.isInCalendar) {
@@ -66,6 +85,9 @@ public class AKKtuellEventView extends Activity {
 		return super.onCreateOptionsMenu(menu);
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection

@@ -12,16 +12,36 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+
+/**
+ * The Class AkkEventAdapter. It uses an array of akkevent and displays them
+ * 
+ * @author Philip Flohr
+ */
 public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
+	
+	/** The context. */
 	private final Context context;
+	
+	/** The events. */
 	private final AkkEvent[] events;
 
+	/**
+	 * Instantiates a new akk event adapter.
+	 *
+	 * @param context the context
+	 * @param events the events
+	 * @param infoManager the info manager
+	 */
 	public AkkEventAdapter(Context context, AkkEvent[] events, InfoManager infoManager) {
 		super(context, R.layout.main_activity_list_item, events);
 		this.context = context;
 		this.events = events;
 	}
 
+	/* (non-Javadoc)
+	 * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
+	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -40,6 +60,9 @@ public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 		return listItemView;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.widget.BaseAdapter#isEnabled(int)
+	 */
 	@Override
 	public boolean isEnabled(int location) {
 		return (location >= 0 && location < events.length) ? (events[location - 1].getEventType().equals(AkkEventType.Schlonz)) : false;

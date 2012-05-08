@@ -21,6 +21,12 @@ import android.content.Context;
 import android.text.Html;
 import android.util.Log;
 
+/**
+ * This class is able to get all requred information from the AKK Homepage
+ * 
+ * @author Philip Flohr
+ *
+ */
 public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	
 	private LinkedList<AkkEvent> eventsWaitingForDescription;
@@ -34,6 +40,11 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private String AkkHpAddr = "http://www.akk.org/chronologie.php";
 	private String AkkWsAddr= "http://www.akk.org/workshops/index.php";
 	
+	/**
+	 * Instantiates a new akk homepage event parser.
+	 *
+	 * @param ctx the ctx
+	 */
 	public AkkHomepageEventParser(Context ctx) {
 		mainThread = Thread.currentThread();
 
@@ -74,6 +85,9 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see org.akk.akktuell.Model.downloader.EventDownloader#updateEvents()
+	 */
 	@Override
 	public AkkEvent[] updateEvents() {
 		if (!this.updateRequested) {
@@ -364,6 +378,9 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run() {
 		AkkEvent event = null;
 		while (true) {

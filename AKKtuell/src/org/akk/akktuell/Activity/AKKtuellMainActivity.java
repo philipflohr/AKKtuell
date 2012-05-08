@@ -27,16 +27,35 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * The Class AKKtuellMainActivity. t creates the model and displays all available events.
+ * 
+ * @author Philip Flohr
+ */
 public class AKKtuellMainActivity extends Activity  {
 	
+	/** The info manager. */
 	private InfoManager infoManager;
+	
+	/** The element list view. */
 	private ListView elementListView;
+	
+	/** The gesture scanner. */
 	private GestureDetector gestureScanner;
+	
+	/** The month counter. */
 	private int monthCounter;
+	
+	/** The MI n_ siz e_ o f_ gesture. */
 	private static int MIN_SIZE_OF_GESTURE=800;
+	
+	/** The view handler. */
 	private Handler viewHandler;
 	
 	
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +118,9 @@ public class AKKtuellMainActivity extends Activity  {
 		}
     }
     
+    /**
+     * On data available.
+     */
     public void onDataAvailable() {
     	setContentView(R.layout.main);
         elementListView = (ListView) findViewById(R.id.main_element_listview);
@@ -120,7 +142,11 @@ public class AKKtuellMainActivity extends Activity  {
     }
     
     
-    //There is something(mayb new) to display! Do it!
+    /**
+     * Display data.
+     * 
+     * There is something(maybe new) to display! Do it!
+     */
     private void displayData() {
 		View mainView = findViewById(R.id.main_activity_layout);
 		TextView listHeaderMonthName = (TextView) mainView.findViewById(R.id.main_activity_list_header);
@@ -131,7 +157,10 @@ public class AKKtuellMainActivity extends Activity  {
     
     
     //This is important for OnFiling function
-	@Override
+	/* (non-Javadoc)
+     * @see android.app.Activity#dispatchTouchEvent(android.view.MotionEvent)
+     */
+    @Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 	    if (gestureScanner != null) {
 	        if (gestureScanner.onTouchEvent(ev))
@@ -141,6 +170,9 @@ public class AKKtuellMainActivity extends Activity  {
 	}
 	
 	//To speed up the app, the activity is not restarted on screen rotation
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onConfigurationChanged(android.content.res.Configuration)
+	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -151,12 +183,18 @@ public class AKKtuellMainActivity extends Activity  {
 	}
     
 	//Close Database on App-close
+	/* (non-Javadoc)
+	 * @see android.app.Activity#finish()
+	 */
 	@Override
 	public void finish() {
 		infoManager.finish();
 		super.finish();
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -164,6 +202,9 @@ public class AKKtuellMainActivity extends Activity  {
 		return super.onCreateOptionsMenu(menu);
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
@@ -183,6 +224,9 @@ public class AKKtuellMainActivity extends Activity  {
 	
 	
 	//end the application if back is pressed and no data is available
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
