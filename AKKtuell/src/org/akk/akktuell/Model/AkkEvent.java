@@ -2,6 +2,7 @@ package org.akk.akktuell.Model;
 
 import java.util.GregorianCalendar;
 
+import android.R.bool;
 import android.net.Uri;
 
 public class AkkEvent {
@@ -53,6 +54,8 @@ public class AkkEvent {
 	private final String eventPlace;
 	
 	private AkkEventType type = null;
+	
+	private boolean isInCalenar = false;
 
 	public AkkEvent(String eventName, GregorianCalendar eventBeginTime, String eventPlace) {
 		this.eventName = eventName;
@@ -122,4 +125,11 @@ public class AkkEvent {
 		this.type = type;
 	}
 	
+	public boolean isInCalendar() {
+		return this.isInCalenar;
+	}
+	
+	public void setCalendarState(boolean state) {
+		this.isInCalenar = state;
+	}
 }

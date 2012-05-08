@@ -31,15 +31,15 @@ public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 		View listItemView = inflater.inflate(R.layout.main_activity_list_item, parent, false);
 		TextView eventNameView = (TextView) listItemView.findViewById(R.id.listitem_eventname);
 		TextView eventDateView = (TextView) listItemView.findViewById(R.id.listitem_eventdate);
-		CheckBox eventInCalendar = (CheckBox) listItemView.findViewById(R.id.listitem_incalendar);
+		//CheckBox eventInCalendar = (CheckBox) listItemView.findViewById(R.id.listitem_incalendar);
 		
 		eventNameView.setText(events[position].getEventName());
 		eventDateView.setText("testDate");
-		if (infoManager.isInCalendar(events[position])) {
+		/*if (infoManager.isInCalendar(events[position])) {
 			eventInCalendar.setChecked(true);
 		} else {
 			eventInCalendar.setChecked(false);
-		}
+		}*/
 		return listItemView;
 	}
 	

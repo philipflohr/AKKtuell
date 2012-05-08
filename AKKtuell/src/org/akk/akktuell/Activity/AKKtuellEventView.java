@@ -7,12 +7,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AKKtuellEventView extends Activity {
 
 	private Tools tools;
+	
+	private boolean isInCalendar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,7 @@ public class AKKtuellEventView extends Activity {
 			setContentView(R.layout.simple_event_view);
 		}
 		Intent intent = getIntent();
+		this.isInCalendar = intent.getBooleanExtra("IS_IN_CALENDAR", false);
 		TextView eventName = (TextView) findViewById(R.id.simple_event_view_eventname);
 		TextView eventDate = (TextView) findViewById(R.id.simple_event_view_eventdate);
 		TextView eventDescription = (TextView) findViewById(R.id.simple_event_view_eventdescription);
@@ -48,5 +54,26 @@ public class AKKtuellEventView extends Activity {
 		} else {
 			setContentView(R.layout.simple_event_view);
 		}
+	}
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		if (!this.isInCalendar) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate(R.menu.event_view_menu, menu);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.menu_item_addtocalendar:
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 }

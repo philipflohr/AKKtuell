@@ -12,6 +12,7 @@ import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -31,6 +32,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	private Thread mainThread;
 	private boolean allEventsParsed;
 	private String AkkHpAddr = "http://www.akk.org/chronologie.php";
+	private String AkkWsAddr= "http://www.akk.org/workshops/index.php";
 	
 	public AkkHomepageEventParser(Context ctx) {
 		mainThread = Thread.currentThread();
@@ -42,16 +44,21 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	}
 	
 	private String getAkkHpSource() throws IOException {
-		allEventsParsed = false;
-		//create DescriptionUpdateThreads
-
-		for (int i = 0; i < 3; i++) {
-			new Thread(getDescThreads, this).start();
-		}
+		return getSource(AkkHpAddr);
 		
-		
+	}
+	
+	private String getWorkshopSource() throws IOException {
+		return getSource(AkkWsAddr);
+	} 
+	
+	private String getDescriptionSource(String link) throws IOException {
+		return getSource(link);
+	}
+	
+	private String getSource(String add) throws ClientProtocolException, IOException {
 		HttpClient client = new DefaultHttpClient();
-		HttpGet request = new HttpGet(AkkHpAddr);
+		HttpGet request = new HttpGet(add);
 		HttpResponse response = client.execute(request);
 
 		InputStream in = response.getEntity().getContent();
@@ -66,30 +73,23 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		return str.toString();
 	}
 	
-	private String getDescriptionSource(String link) throws IOException {
-		HttpClient client = new DefaultHttpClient();
-		HttpGet request = new HttpGet(link);
-		HttpResponse response = client.execute(request);
-
-		InputStream in = response.getEntity().getContent();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		StringBuilder str = new StringBuilder();
-		String line = null;
-		while((line = reader.readLine()) != null)
-		{
-		    str.append(line);
-		}
-		in.close();
-		return str.toString();
-	}
 	
 	@Override
 	public AkkEvent[] updateEvents() {
 		if (!this.updateRequested) {
 			this.updateRequested = true;
+			allEventsParsed = false;
+			
+			for (int i = 0; i < 3; i++) {
+				new Thread(getDescThreads, this).start();
+			}
+			
+			
 			String htmlSource;
+			String workshopSource;
 			try {
 				htmlSource = getAkkHpSource();
+				workshopSource = getWorkshopSource();
 			} catch (IOException e) {
 				Log.d("AkkHomepageParser", "error while downloading akk source code");
 				e.printStackTrace();
@@ -97,6 +97,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			}
 			
 			LinkedList<String> singleEventhtmlSource = getSingleEventSources(htmlSource);
+			LinkedList<String> singleWorkshopNamesAndLinks = getWorkshopNamesAndLinks(workshopSource);
 			
 			if (singleEventhtmlSource.size() < 3) {
 				//this is not a correct version of the akk homepage
@@ -262,7 +263,21 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 					newAkkEventPlace = "This is s good question - but the website has no answer for this";
 					newAkkEvent = new AkkEvent(newAkkEventName, newAkkEventDate, newAkkEventPlace);
 					newAkkEvent.setType(newAkkEventType);
-					this.addElementToWaitingList(newAkkEvent);
+					
+					//get link and set as description
+					for (String s: singleWorkshopNamesAndLinks) {
+						String s_ASCII = Html.fromHtml(s).toString();
+						if (s_ASCII.contains(newAkkEventName.substring(10, newAkkEventName.length() - 1))) {
+							newAkkEvent.setDescription("http://www.akk.org/workshops/" + s.split("\">")[0]);
+							break;
+						}
+					}
+					if (newAkkEvent.getEventDescription() == null || newAkkEvent.getEventDescription().length() == 0) {
+						newAkkEvent.setDescription("Nothing about this...");
+						this.addElementToDBPushList(newAkkEvent);
+					} else {
+						this.addElementToWaitingList(newAkkEvent);
+					}
 				}
 			}
 			allEventsParsed = true;
@@ -289,6 +304,21 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			return result;
 		}
 		return null;
+	}
+
+
+
+	private LinkedList<String> getWorkshopNamesAndLinks(String workshopSource) {
+		workshopSource = workshopSource.split("<TABLE class=\"workshops\">")[1];
+		workshopSource = workshopSource.split("</TABLE>")[0];
+		LinkedList<String> result = new LinkedList<String>();
+		String[] splittedSource = workshopSource.split("HREF=\"");
+		
+		for (int i = 1; i < splittedSource.length; i++) {
+			result.add(Html.fromHtml(splittedSource[i].split("</A></TD>")[0]).toString());
+		}
+		
+		return result;
 	}
 
 	private GregorianCalendar getEventDateFromString(String substring) {
@@ -403,14 +433,22 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 				e.printStackTrace();
 				event.setDescription("Error fetching Description");
 				return;
-			} catch (ArrayIndexOutOfBoundsException e) {
+			} /*catch (ArrayIndexOutOfBoundsException e) {
 				Log.d("HPParser", "Could not get event Description...");
 				e.printStackTrace();
 				event.setDescription("Error fetching Description");
+			}*/
+		} else if (event.getEventType() == AkkEventType.Workshop) {
+			String descSource = null;
+			try {
+				descSource = getSource(event.getEventDescription());
+			} catch (IOException e) {
+				e.printStackTrace();
 				return;
 			}
-		} else if (event.getEventType() == AkkEventType.Workshop) {
-			event.setDescription("This is not implemented yet");
+			descSource = descSource.split("<div class=\"beschreibung\">")[1];
+			descSource = descSource.split("</div>")[0];
+			event.setDescription(Html.fromHtml(descSource).toString());
 		}
 	}
 

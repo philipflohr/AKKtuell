@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <ImageView
+    <!--- ImageView
         android:id="@+id/list_image_new"
         android:layout_width="wrap_content"
         android:layout_height="55dp"
         android:src="@drawable/ic_new"
-        android:focusable="false" />
+        android:focusable="false" /> -->
 
     <TwoLineListItem
         android:id="@+id/listitem_listitem"
@@ -38,11 +38,11 @@
             android:focusable="false"/>
     </TwoLineListItem>
 
-    <CheckBox
+    <!--  <CheckBox
         android:id="@+id/listitem_incalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
         android:focusable="false"
-        android:clickable="false"/>
+        android:clickable="false"/>-->
 
 </LinearLayout>
