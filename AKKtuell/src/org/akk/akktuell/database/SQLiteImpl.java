@@ -139,11 +139,12 @@ class SQLiteImpl implements DBInterface {
 			events[i] = new AkkEvent(
 							cursor.getString(cursor.getColumnIndex("name")),
 							cursor.getString(cursor.getColumnIndex("description")),
+							"",
+							AkkEventType.getAkkEventType(cursor.getString(cursor.getColumnIndex("type"))),
 							iso8601ToGregorianCalendar(
 									cursor.getString(cursor.getColumnIndex("date"))),
 							Uri.parse(cursor.getString(cursor.getColumnIndex("uri")))
 						);
-			events[i].setType(AkkEventType.getAkkEventType(cursor.getString(cursor.getColumnIndex("type"))));
 		}
 		cursor.close();
 		return events;
