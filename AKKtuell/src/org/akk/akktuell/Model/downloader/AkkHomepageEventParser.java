@@ -455,6 +455,7 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 		} else if (event.getEventType() == AkkEventType.Workshop) {
 			String descSource = null;
 			try {
+				String desc = event.getEventDescription();
 				descSource = getSource(event.getEventDescription());
 			} catch (IOException e) {
 				e.printStackTrace();

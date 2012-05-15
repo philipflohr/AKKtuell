@@ -114,12 +114,13 @@ public class AkkEvent {
 	 * @param eventType the event type
 	 * @param eventDate the event date
 	 */
-	public AkkEvent (String eventName, String eventDescription, String eventPlace, AkkEventType eventType, GregorianCalendar eventDate) {
+	public AkkEvent (String eventName, String eventDescription, String eventPlace, AkkEventType eventType, GregorianCalendar eventDate, Uri pictureUri) {
 		this.eventName = eventName;
 		this.eventDescription = eventDescription;
 		this.eventPlace = eventPlace;
 		this.setType(eventType);
 		this.eventBeginTime = eventDate;
+		this.eventPictureUri = pictureUri;
 	}
 
 	/* (non-Javadoc)
