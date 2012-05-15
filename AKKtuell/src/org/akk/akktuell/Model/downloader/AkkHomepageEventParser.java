@@ -315,7 +315,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			for (int i = 0; i < eventsWaitingForDBPush.size(); i++) {
 				result[i] = eventsWaitingForDBPush.get(i);
 			}
-			notifyOnDownloadFinished(result);
 			return result;
 		}
 		return null;
@@ -414,26 +413,6 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			}
 		}	
 	}
-
-	/**
-	 * Notifies the attached listeners when a download has started.
-	 */
-	private void notifyOnDownloadStarted() {
-		for (EventDownloadListener l : this.listeners) {
-			l.downloadStarted();
-		}
-	}
-
-	/**
-	 * Notifies the attached listeners when the download has finished
-	 * and returns the downloaded {@link AkkEvent AkkEvents}.
-	 * @param events the downloaded events
-	 */
-	private void notifyOnDownloadFinished(AkkEvent[] events) {
-		for (EventDownloadListener l : this.listeners) {
-			l.downloadFinished(events);
-		}
-	}
 	
 	private void addDescriptionToEvent(AkkEvent event) {
 		if (event.getEventType() == AkkEventType.Schlonz) {
@@ -504,11 +483,4 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 	public void setUrl(String url) {
 		this.AkkHpAddr = url;
 	}
-	
-
-	@Override
-	public void addEventDownloadListener(EventDownloadListener infoManager) {
-		listeners.add(infoManager);		
-	}
-
 }

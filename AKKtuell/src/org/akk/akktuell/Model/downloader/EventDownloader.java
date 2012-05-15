@@ -32,6 +32,4 @@ public interface EventDownloader {
 	 * @param url the url to use.
 	 */
 	public void setUrl(String url);
-
-	public void addEventDownloadListener(EventDownloadListener listener);
 }
