@@ -97,7 +97,7 @@ public class InfoManager implements EventDownloadListener {
 	}
 	
 	/**
-	 * Update event lists.
+	 * Update event lists by getting all events out of the local database.
 	 */
 	private void updateEventLists() {
 		for (int i = 0; i < 12; i++) {

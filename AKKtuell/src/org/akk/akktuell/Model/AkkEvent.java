@@ -108,17 +108,18 @@ public class AkkEvent {
 	/**
 	 * Instantiates a new akk event.
 	 *
-	 * @param string the string
-	 * @param string2 the string2
-	 * @param iso8601ToGregorianCalendar the iso8601 to gregorian calendar
-	 * @param parse the parse
+	 * @param eventName the event name
+	 * @param eventDescription the event description
+	 * @param eventPlace the event place
+	 * @param eventType the event type
+	 * @param eventDate the event date
 	 */
-	public AkkEvent(String string, String string2,
-			GregorianCalendar iso8601ToGregorianCalendar, Uri parse) {
-		this.eventName = string;
-		this.eventBeginTime = iso8601ToGregorianCalendar;
-		this.eventPlace = "test";
-		// TODO Auto-generated constructor stub
+	public AkkEvent (String eventName, String eventDescription, String eventPlace, AkkEventType eventType, GregorianCalendar eventDate) {
+		this.eventName = eventName;
+		this.eventDescription = eventDescription;
+		this.eventPlace = eventPlace;
+		this.setType(eventType);
+		this.eventBeginTime = eventDate;
 	}
 
 	/* (non-Javadoc)
