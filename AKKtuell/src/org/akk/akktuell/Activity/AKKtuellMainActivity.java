@@ -65,25 +65,30 @@ public class AKKtuellMainActivity extends Activity  {
 			@Override
 			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 					float velocityY) {
-				if (velocityX > MIN_SIZE_OF_GESTURE) {
-					if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter - 1)) {
-						monthCounter--;
+				if (infoManager.readyToDisplayData()) {
+					if (velocityX > MIN_SIZE_OF_GESTURE) {
+						if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter - 1)) {
+							monthCounter--;
+						} else {
+							monthCounter = 11 - (new GregorianCalendar().get(GregorianCalendar.MONTH));
+						}
+					} else if (velocityX < -1*MIN_SIZE_OF_GESTURE){
+						if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter + 1)) {
+							monthCounter++;
+						} else {
+							monthCounter = -(new GregorianCalendar().get(GregorianCalendar.MONTH));
+						}
 					} else {
-						monthCounter = 11 - (new GregorianCalendar().get(GregorianCalendar.MONTH));
+						//this is not a guesture we want to interpret
+						return false;
 					}
-				} else if (velocityX < -1*MIN_SIZE_OF_GESTURE){
-					if (infoManager.setCurrentMonth(new GregorianCalendar().get(GregorianCalendar.MONTH) + monthCounter + 1)) {
-						monthCounter++;
-					} else {
-						monthCounter = -(new GregorianCalendar().get(GregorianCalendar.MONTH));
-					}
+					
+					AKKtuellMainActivity.this.displayData();
+					return true;
 				} else {
-					//this is not a guesture we want to interpret
+					//there is no data...
 					return false;
 				}
-				
-				AKKtuellMainActivity.this.displayData();
-				return true;
 			}
 		});
         

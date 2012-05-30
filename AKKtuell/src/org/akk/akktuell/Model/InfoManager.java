@@ -82,6 +82,7 @@ public class InfoManager implements EventDownloadListener {
 		//finished checking
 		
 		updateManager = EventDownloadManager.getInstance(context, this);
+		updateManager.addEventDownloadListener(this);
 		updateManagerThread = new Thread(updateManager);
 		if (this.isOnline) {
 			updateManagerThread.start();
@@ -101,7 +102,7 @@ public class InfoManager implements EventDownloadListener {
 	private void updateEventLists() {
 		//from 1 to 12;) remember...
 		for (int i = 1; i <= 12; i++) {
-			eventsPerMonthSortedByDate[i] = database.getAllEventsInMonth(i, currentYear, DBFields.EVENT_DATE, DBInterface.ASCENDING); 
+			eventsPerMonthSortedByDate[i - 1] = database.getAllEventsInMonth(i, currentYear, DBFields.EVENT_DATE, DBInterface.ASCENDING); 
 		}
 		
 	}

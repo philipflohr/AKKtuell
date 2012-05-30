@@ -23,8 +23,9 @@ public class EventDownloadManager implements Runnable {
 	
 	/** JSON Constant. This is used to identify JSON Download links as well as
 	 * the array position of the JSON Downloader in the downloaders array.*/
-	private static final int JSON = 0;
-	private static final int HTML = 1;
+	//TODO: Zahlen wieder drehen, wenn JSON parser fertig
+	private static final int JSON = 1;
+	private static final int HTML = 0;
 
 	
 
@@ -88,7 +89,7 @@ public class EventDownloadManager implements Runnable {
 			if (events != null) {
 				this.unsuccessfullDownloadAttempts = 0;
 				download.setOnlineStatus(true);
-				return null;
+				return events;
 			} else {
 				download.setOnlineStatus(false);
 				unsuccessfullDownloadAttempts++;
