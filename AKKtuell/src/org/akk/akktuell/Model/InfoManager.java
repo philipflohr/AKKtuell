@@ -61,11 +61,10 @@ public class InfoManager implements EventDownloadListener {
 		database = Database.getInstance(context);
 
 		database.open();
+		//load initial list from db
 		updateEventLists();
 		calendar = new CalendarBridge();
 
-		//load initial list from db
-		
 		if (readyToDisplayData()) {
 			this.viewHandler.sendEmptyMessage(0);
 		}
@@ -100,7 +99,8 @@ public class InfoManager implements EventDownloadListener {
 	 * Update event lists by getting all events out of the local database.
 	 */
 	private void updateEventLists() {
-		for (int i = 0; i < 12; i++) {
+		//from 1 to 12;) remember...
+		for (int i = 1; i <= 12; i++) {
 			eventsPerMonthSortedByDate[i] = database.getAllEventsInMonth(i, currentYear, DBFields.EVENT_DATE, DBInterface.ASCENDING); 
 		}
 		

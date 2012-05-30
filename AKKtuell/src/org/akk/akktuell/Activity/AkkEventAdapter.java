@@ -65,6 +65,7 @@ public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 	 */
 	@Override
 	public boolean isEnabled(int location) {
+		//TODO: ???!!!???
 		return (location >= 0 && location < events.length) ? (events[location - 1].getEventType().equals(AkkEventType.Schlonz)) : false;
 	}
 }
