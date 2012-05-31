@@ -1,11 +1,20 @@
 package org.akk.akktuell.toolkit;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
+
+import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Display;
 
 public class Tools {
@@ -50,14 +59,55 @@ public class Tools {
 	}
 	
 	
-	public boolean getAndStoreEventPicture(String eventSource, String relativeStorePath) {
+	public boolean getAndStoreEventPicture(String picSource, String relativeStorePath, Context ctx) {
 		File imgFile = new  File(relativeStorePath);
 	    if(imgFile.exists())
 	    {
 	        return true;
 	    } else {
-	    	//TODO: impl
-	    	return false;
+	    	try {
+		    	String FILENAME = relativeStorePath;
+		    	
+
+		    	//Get file from net
+		    	 File dir = new File ("/bilder");
+		           if(dir.exists()==false) {
+		                dir.mkdirs();
+		           }
+
+		           URL url = new URL(picSource); //you can write here any link
+
+		           long startTime = System.currentTimeMillis();
+		           Log.d("DownloadManager", "download begining");
+		           Log.d("DownloadManager", "download url:" + url);
+		           Log.d("DownloadManager", "downloaded file name:" + relativeStorePath);
+
+		           /* Open a connection to that URL. */
+		           URLConnection ucon = url.openConnection();
+
+		           /*
+		            * Define InputStreams to read from the URLConnection.
+		            */
+		           InputStream is = ucon.getInputStream();
+		           BufferedInputStream bis = new BufferedInputStream(is);
+
+		           /*
+		            * Read bytes to the Buffer until there is nothing more to read(-1).
+		            */
+		           ByteArrayBuffer baf = new ByteArrayBuffer(5000);
+		           int current = 0;
+		           while ((current = bis.read()) != -1) {
+		              baf.append((byte) current);
+		           }
+	
+		    	FileOutputStream fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+		    	fos.write(baf.toByteArray());
+		    	fos.close();
+		    	return true;
+	    	} catch (Exception e) {
+	    		e.printStackTrace();
+	    		return false;
+	    	}
 	    }
 	}
 	

@@ -139,6 +139,7 @@ public class AKKtuellMainActivity extends Activity  {
         				intent.putExtra("EVENT_NAME", clickedEvent.getEventName());
         				intent.putExtra("EVENT_DATE", "test");
         				intent.putExtra("EVENT_DESCRIPTION", clickedEvent.getEventDescription());
+        				intent.putExtra("PIC_RELATIVE_PATH", clickedEvent.getEventPicRelPath());
         				startActivity(intent);
         			}
         		}

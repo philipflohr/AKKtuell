@@ -81,8 +81,12 @@ public class AkkEvent {
 	private final GregorianCalendar eventBeginTime;
 	
 	/** The event picture uri. */
-	private String eventPictureRelativePath;
+	private String eventPictureRelativePath = null;
 	
+	public String getEventPictureRelativePath() {
+		return eventPictureRelativePath;
+	}
+
 	/** The event place. */
 	private final String eventPlace;
 	

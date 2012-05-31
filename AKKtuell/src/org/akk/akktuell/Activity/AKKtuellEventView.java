@@ -59,7 +59,7 @@ public class AKKtuellEventView extends Activity {
 		eventDescription.setText(intent.getStringExtra("EVENT_DESCRIPTION"));
 		String eventPicPath = intent.getStringExtra("PIC_RELATIVE_PATH");
 		if (eventPicPath != null) {
-			if (Tools.getInstance(this).getAndStoreEventPicture("http://www.akk.org/schlonze/bilder/", eventPicPath.substring(7))) {
+			if (Tools.getInstance(this).getAndStoreEventPicture("http://www.akk.org/schlonze/bilder/", eventPicPath.substring(7), getApplicationContext())) {
 				eventImage.setClickable(false);
 				File imgFile = new  File(eventPicPath);
 			    if(imgFile.exists())
