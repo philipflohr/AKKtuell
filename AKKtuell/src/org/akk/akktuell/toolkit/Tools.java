@@ -1,9 +1,11 @@
 package org.akk.akktuell.toolkit;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.view.Display;
 
 public class Tools {
@@ -45,6 +47,18 @@ public class Tools {
 	public boolean isInLandscapeMode() {
 		Display display = activity.getWindowManager().getDefaultDisplay();
     	return display.getWidth() > display.getHeight() ? true : false;
+	}
+	
+	
+	public boolean getAndStoreEventPicture(String eventSource, String relativeStorePath) {
+		File imgFile = new  File(relativeStorePath);
+	    if(imgFile.exists())
+	    {
+	        return true;
+	    } else {
+	    	//TODO: impl
+	    	return false;
+	    }
 	}
 	
 }

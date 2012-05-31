@@ -1,11 +1,14 @@
 package org.akk.akktuell.Activity;
 
+import java.io.File;
+
 import org.akk.akktuell.R;
 import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,9 +57,18 @@ public class AKKtuellEventView extends Activity {
 		eventName.setText(intent.getStringExtra("EVENT_NAME"));
 		eventDate.setText(intent.getStringExtra("EVENT_DATE"));
 		eventDescription.setText(intent.getStringExtra("EVENT_DESCRIPTION"));
-		// Uri eventPicUri = (Uri)
-		// intent.getSerializableExtra("EVENT_PICTURE_URI");
-		// eventImage.setImageURI(eventPicUri);
+		String eventPicPath = intent.getStringExtra("PIC_RELATIVE_PATH");
+		if (eventPicPath != null) {
+			if (Tools.getInstance(this).getAndStoreEventPicture("http://www.akk.org/schlonze/bilder/", eventPicPath.substring(7))) {
+				eventImage.setClickable(false);
+				File imgFile = new  File(eventPicPath);
+			    if(imgFile.exists())
+			    {
+			        eventImage.setImageURI(Uri.fromFile(imgFile));
+
+			    }
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
