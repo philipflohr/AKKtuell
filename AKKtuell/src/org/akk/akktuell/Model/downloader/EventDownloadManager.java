@@ -35,8 +35,8 @@ public class EventDownloadManager implements Runnable {
 		//AkkHomepageEventParser parser = new AkkHomepageEventParser(ctx);
 		//parser.addEventDownloadListener(infoManager);
 		//downloader.add(parser);
-		for (String json : getJsonLinks())
-			this.downloads.add(new Download(json, JSON));
+//		for (String json : getJsonLinks())
+//			this.downloads.add(new Download(json, JSON));
 		for (String html : getHtmlLinks())
 			this.downloads.add(new Download(html, HTML));
 
@@ -75,8 +75,8 @@ public class EventDownloadManager implements Runnable {
 				unsuccessfullDownloadAttempts <= downloadAttemptLimit
 					|| untilSuccess)
 				) {
-			Download download = downloads.get(
-					unsuccessfullDownloadAttempts % this.downloads.size());
+			Download download = downloads.get(0);
+			//		unsuccessfullDownloadAttempts % this.downloads.size());
 
 			this.currentDownloader = download.getDownloadType();
 
