@@ -72,13 +72,13 @@ public interface DBInterface {
 	 * @param eventName the name of the event.
 	 * @param eventDescription the description of the event.
 	 * @param eventBeginTime the starting date of the event.
-	 * @param eventPictureUri the uri to the event.
+	 * @param picRelativePath teh path to the pic.
 	 * @return true, if successful.
 	 * @throws DBException in case the event could not be inserted.
 	 */
 	public boolean insertEvent(String eventName, String eventDescription,
 			AkkEventType eventType, GregorianCalendar eventBeginTime,
-			Uri eventPictureUri) throws DBException;
+			String picRealtivePath) throws DBException;
 
 	/**
 	 * Deletes the given {@link AkkEvent} from the database.

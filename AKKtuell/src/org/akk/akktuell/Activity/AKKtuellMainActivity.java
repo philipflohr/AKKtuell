@@ -1,12 +1,14 @@
 package org.akk.akktuell.Activity;
 
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.InfoManager;
 import org.akk.akktuell.database.DBException;
+import org.akk.akktuell.toolkit.Tools;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -137,7 +139,7 @@ public class AKKtuellMainActivity extends Activity  {
         			if (clickedEvent != null && clickedEvent.getEventDescription() != null) {
         				Intent intent = new Intent(AKKtuellMainActivity.this,AKKtuellEventView.class);
         				intent.putExtra("EVENT_NAME", clickedEvent.getEventName());
-        				intent.putExtra("EVENT_DATE", "test");
+        				intent.putExtra("EVENT_DATE", Tools.getTimeString(clickedEvent.getEventBeginTime()));
         				intent.putExtra("EVENT_DESCRIPTION", clickedEvent.getEventDescription());
         				intent.putExtra("PIC_RELATIVE_PATH", clickedEvent.getEventPicRelPath());
         				startActivity(intent);

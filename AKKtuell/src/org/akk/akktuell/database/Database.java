@@ -69,10 +69,10 @@ public class Database implements DBInterface {
 
 	@Override
 	public boolean insertEvent(String eventName, String eventDescription,
-			AkkEventType eventType, GregorianCalendar eventBeginTime, Uri eventPictureUri)
+			AkkEventType eventType, GregorianCalendar eventBeginTime, String picRelativePath)
 			throws DBException {
 		return dbImplementation.insertEvent(eventName, eventDescription, eventType,
-				eventBeginTime, eventPictureUri);
+				eventBeginTime, picRelativePath);
 	}
 
 	@Override

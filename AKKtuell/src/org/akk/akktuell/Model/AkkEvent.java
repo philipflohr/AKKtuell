@@ -2,7 +2,6 @@ package org.akk.akktuell.Model;
 
 import java.util.GregorianCalendar;
 
-import android.net.Uri;
 
 /**
  * The Class AkkEvent. 

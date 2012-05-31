@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 
 import org.apache.http.util.ByteArrayBuffer;
 
@@ -59,28 +61,31 @@ public class Tools {
 	}
 	
 	
-	public boolean getAndStoreEventPicture(String picSource, String relativeStorePath, Context ctx) {
-		File imgFile = new  File(relativeStorePath);
+	public File getAndStoreEventPicture(String picSource, String relativeStorePath, Context ctx) {
+		File dir = new File("/data/data/org.akk.akktuell/files");
+		String imgFilePath = dir.getAbsolutePath();
+		imgFilePath += "/" + relativeStorePath;
+		File imgFile = new File(imgFilePath);
 	    if(imgFile.exists())
 	    {
-	        return true;
+	        return imgFile;
 	    } else {
 	    	try {
 		    	String FILENAME = relativeStorePath;
 		    	
 
 		    	//Get file from net
-		    	 File dir = new File ("/bilder");
+		    	 
 		           if(dir.exists()==false) {
 		                dir.mkdirs();
 		           }
 
-		           URL url = new URL(picSource); //you can write here any link
+		           URL url = new URL(picSource + relativeStorePath); //you can write here any link
 
 		           long startTime = System.currentTimeMillis();
 		           Log.d("DownloadManager", "download begining");
 		           Log.d("DownloadManager", "download url:" + url);
-		           Log.d("DownloadManager", "downloaded file name:" + relativeStorePath);
+		           Log.d("DownloadManager", "downloaded file name:" + FILENAME);
 
 		           /* Open a connection to that URL. */
 		           URLConnection ucon = url.openConnection();
@@ -103,12 +108,16 @@ public class Tools {
 		    	FileOutputStream fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE);
 		    	fos.write(baf.toByteArray());
 		    	fos.close();
-		    	return true;
+		    	return getAndStoreEventPicture(picSource, relativeStorePath, ctx);
 	    	} catch (Exception e) {
 	    		e.printStackTrace();
-	    		return false;
+	    		return null;
 	    	}
 	    }
+	}
+	
+	public static String getTimeString(GregorianCalendar date) {
+		return new SimpleDateFormat("dd.MM.yyyy - HH:mm").format(date.getTime());
 	}
 	
 }

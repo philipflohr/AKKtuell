@@ -143,7 +143,7 @@ class SQLiteImpl implements DBInterface {
 							AkkEventType.getAkkEventType(cursor.getString(cursor.getColumnIndex("type"))),
 							iso8601ToGregorianCalendar(
 									cursor.getString(cursor.getColumnIndex("date"))),
-							Uri.parse(cursor.getString(cursor.getColumnIndex("uri")))
+							cursor.getString(cursor.getColumnIndex("pic_path"))
 						);
 		}
 		cursor.close();
@@ -200,7 +200,7 @@ class SQLiteImpl implements DBInterface {
 		}
 		return this.insertEvent(event.getEventName(), event.getEventDescription(),
 				event.getEventType(),
-				event.getEventBeginTime(), event.getEventPicUri(), timestamp);
+				event.getEventBeginTime(), event.getEventPictureRelativePath(), timestamp);
 	}
 
 	@Override
@@ -246,7 +246,7 @@ class SQLiteImpl implements DBInterface {
 	 * @throws DBException in case the event could not be inserted.
 	 */
 	private boolean insertEvent(String eventName, String eventDescription, AkkEventType eventType,
-			GregorianCalendar eventBeginTime, Uri eventPictureUri, long timestamp) throws DBException {
+			GregorianCalendar eventBeginTime, String picRelativePath, long timestamp) throws DBException {
 		if (eventName == null
 				|| eventDescription == null
 				|| eventType == null //TODO needed?
@@ -265,7 +265,7 @@ class SQLiteImpl implements DBInterface {
     	values.put("description", eventDescription);
     	values.put("type", eventType.toString());
     	values.put("date", dateToIso8601(eventBeginTime));
-    	values.put("uri", (eventPictureUri != null) ? eventPictureUri.toString() : "");
+    	values.put("pic_path", (picRelativePath != null) ? picRelativePath : "");
     	values.put("hash", hash);
     	values.put("timestamp", timestamp);
 
@@ -281,8 +281,8 @@ class SQLiteImpl implements DBInterface {
 
 	@Override
 	public boolean insertEvent(String eventName, String eventDescription, AkkEventType eventType,
-			GregorianCalendar eventBeginTime, Uri eventPictureUri) throws DBException {
-		return insertEvent(eventName, eventDescription, eventType, eventBeginTime, eventPictureUri,
+			GregorianCalendar eventBeginTime, String picRealtivePath) throws DBException {
+		return insertEvent(eventName, eventDescription, eventType, eventBeginTime, picRealtivePath,
 				System.currentTimeMillis());
 	}
 
@@ -506,7 +506,7 @@ class SQLiteImpl implements DBInterface {
         				+ "description " + SqlDataTypes.STRING + ", "
         				+ "type " + SqlDataTypes.STRING + " not null, "
         				+ "date " + SqlDataTypes.DATE + " not null, "
-        				+ "uri " + SqlDataTypes.STRING + ", "
+        				+ "pic_path " + SqlDataTypes.STRING + ", "
         				+ "hash " + SqlDataTypes.INTEGER + " unique not null, " 
         				+ "timestamp " + SqlDataTypes.INTEGER + " not null"
         				+ "); "

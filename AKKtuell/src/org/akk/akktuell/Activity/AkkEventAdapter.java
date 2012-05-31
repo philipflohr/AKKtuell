@@ -4,6 +4,7 @@ import org.akk.akktuell.R;
 import org.akk.akktuell.Model.AkkEvent;
 import org.akk.akktuell.Model.AkkEvent.AkkEventType;
 import org.akk.akktuell.Model.InfoManager;
+import org.akk.akktuell.toolkit.Tools;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -51,7 +52,7 @@ public class AkkEventAdapter extends ArrayAdapter<AkkEvent> {
 		//CheckBox eventInCalendar = (CheckBox) listItemView.findViewById(R.id.listitem_incalendar);
 		
 		eventNameView.setText(events[position].getEventName());
-		eventDateView.setText("testDate");
+		eventDateView.setText(Tools.getTimeString(events[position].getEventBeginTime()));
 		/*if (infoManager.isInCalendar(events[position])) {
 			eventInCalendar.setChecked(true);
 		} else {
