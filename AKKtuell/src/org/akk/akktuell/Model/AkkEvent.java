@@ -81,7 +81,7 @@ public class AkkEvent {
 	private final GregorianCalendar eventBeginTime;
 	
 	/** The event picture uri. */
-	private Uri eventPictureUri;
+	private String eventPictureRelativePath;
 	
 	/** The event place. */
 	private final String eventPlace;
@@ -114,13 +114,13 @@ public class AkkEvent {
 	 * @param eventType the event type
 	 * @param eventDate the event date
 	 */
-	public AkkEvent (String eventName, String eventDescription, String eventPlace, AkkEventType eventType, GregorianCalendar eventDate, Uri pictureUri) {
+	public AkkEvent (String eventName, String eventDescription, String eventPlace, AkkEventType eventType, GregorianCalendar eventDate, String picturePath) {
 		this.eventName = eventName;
 		this.eventDescription = eventDescription;
 		this.eventPlace = eventPlace;
 		this.setType(eventType);
 		this.eventBeginTime = eventDate;
-		this.eventPictureUri = pictureUri;
+		this.eventPictureRelativePath = picturePath;
 	}
 
 	/* (non-Javadoc)
@@ -157,19 +157,19 @@ public class AkkEvent {
 			throw new IllegalArgumentException("Try to check if Event was updated. Failure: " + this.eventName + " was compared with " + otherEvent.getEventName());
 		}
 		if ((!this.eventDescription.equals(otherEvent.getEventDescription())) || (!this.eventBeginTime.equals(otherEvent.getEventBeginTime()))
-				||(this.eventPictureUri.equals(otherEvent.getEventPicUri()))) {
+				||(this.eventPictureRelativePath.equals(otherEvent.getEventPicRelPath()))) {
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Gets the event pic uri.
+	 * Gets the event pic realtive path.
 	 *
-	 * @return the event pic uri
+	 * @return the event pic path
 	 */
-	public Uri getEventPicUri() {
-		return this.eventPictureUri;
+	public String getEventPicRelPath() {
+		return this.eventPictureRelativePath;
 	}
 
 	/**
@@ -242,5 +242,9 @@ public class AkkEvent {
 	 */
 	public void setCalendarState(boolean state) {
 		this.isInCalenar = state;
+	}
+	
+	public void setPicRelPath(String path) {
+		this.eventPictureRelativePath = "bilder/" + path;
 	}
 }

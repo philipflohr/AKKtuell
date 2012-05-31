@@ -422,6 +422,11 @@ public class AkkHomepageEventParser implements Runnable, EventDownloader {
 			eventDescriptionSource = "http://www.akk.org" + eventDescriptionSource;
 			try {
 				eventDescriptionSource = getDescriptionSource(eventDescriptionSource);
+				if (eventDescriptionSource.split("</H1>")[1].split("\">")[0].contains("<IMG SRC=")) {
+					//there is a picture;)
+					event.setPicRelPath(eventDescriptionSource.split("</H1>")[1].split("\">")[0].split("[")[1].split("]")[0]);
+					//Ich weiß, das tut man nicht;)
+				}
 				String eventDescription = eventDescriptionSource.split("<P>")[1];
 				eventDescription = Html.fromHtml(eventDescription.split("</P>")[0]).toString();
 				event.setDescription(eventDescription);
